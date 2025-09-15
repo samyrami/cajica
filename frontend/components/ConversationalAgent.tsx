@@ -214,6 +214,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
               onUserMessage={handleUserMessage}
               onAssistantMessage={handleAssistantMessage}
               onCaptureStateChange={setIsCapturing}
+              agentState={agentState}
             />
             <SimpleVoiceAssistant 
               onStateChange={setAgentState}
@@ -236,29 +237,147 @@ function ConversationCapture(props: {
   onUserMessage?: (message: string) => void;
   onAssistantMessage?: (message: string) => void;
   onCaptureStateChange?: (isCapturing: boolean) => void;
+  agentState: AgentState;
 }) {
   const room = useRoomContext();
-  const { onUserMessage, onAssistantMessage, onCaptureStateChange } = props;
+  const { onUserMessage, onAssistantMessage, onCaptureStateChange, agentState } = props;
   const [lastProcessedMessage, setLastProcessedMessage] = useState<string>('');
   
-  // Función para procesar mensajes únicos
-  const processUniqueMessage = useCallback((message: string, isUser: boolean) => {
+  // Estados para manejar mensajes acumulativos
+  const [currentUserMessage, setCurrentUserMessage] = useState<string>('');
+  const [currentAssistantMessage, setCurrentAssistantMessage] = useState<string>('');
+  const [userMessageTimer, setUserMessageTimer] = useState<NodeJS.Timeout | null>(null);
+  const [assistantMessageTimer, setAssistantMessageTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  // Función para procesar mensajes completos con debouncing
+  const processCompleteMessage = useCallback((message: string, isUser: boolean) => {
     const trimmedMessage = message.trim();
     
-    // Evitar duplicados
-    if (trimmedMessage === lastProcessedMessage || !trimmedMessage) {
+    // Verificar que el mensaje sea válido y no sea duplicado
+    if (!trimmedMessage || trimmedMessage === lastProcessedMessage) {
       return;
     }
 
-    console.log(`Processing ${isUser ? 'user' : 'assistant'} message:`, trimmedMessage);
+    // Solo procesar mensajes que parezcan completos
+    const hasEndPunctuation = /[.!?]\s*$/.test(trimmedMessage);
+    const isReasonableLength = trimmedMessage.length >= 8; // Mínimo 8 caracteres
+    const hasMultipleWords = trimmedMessage.split(' ').length >= 2;
+    
+    // Un mensaje se considera completo si:
+    // 1. Termina con puntuación, O
+    // 2. Tiene longitud razonable Y múltiples palabras
+    const seemsComplete = hasEndPunctuation || (isReasonableLength && hasMultipleWords);
+    
+    if (!seemsComplete) {
+      console.log('Message seems incomplete, skipping:', trimmedMessage);
+      return;
+    }
+
+    console.log(`Processing complete ${isUser ? 'user' : 'assistant'} message:`, trimmedMessage);
     setLastProcessedMessage(trimmedMessage);
 
     if (isUser && onUserMessage) {
       onUserMessage(trimmedMessage);
+      setCurrentUserMessage(''); // Limpiar mensaje actual
     } else if (!isUser && onAssistantMessage) {
       onAssistantMessage(trimmedMessage);
+      setCurrentAssistantMessage(''); // Limpiar mensaje actual
     }
   }, [lastProcessedMessage, onUserMessage, onAssistantMessage]);
+  
+  // Función para manejar mensajes incrementales
+  const handleIncrementalMessage = useCallback((message: string, isUser: boolean) => {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) return;
+
+    if (isUser) {
+      // Actualizar mensaje del usuario actual
+      setCurrentUserMessage(prev => {
+        // Si el nuevo mensaje es más largo que el anterior, actualizar
+        if (trimmedMessage.length > prev.length && trimmedMessage.includes(prev)) {
+          return trimmedMessage;
+        }
+        // Si es un mensaje completamente nuevo, reemplazar
+        if (!trimmedMessage.includes(prev) && !prev.includes(trimmedMessage)) {
+          return trimmedMessage;
+        }
+        return prev;
+      });
+      
+      // Limpiar timer anterior
+      if (userMessageTimer) {
+        clearTimeout(userMessageTimer);
+      }
+      
+      // Establecer nuevo timer para procesar el mensaje después de 2 segundos de silencio
+      const newTimer = setTimeout(() => {
+        setCurrentUserMessage(current => {
+          if (current.trim()) {
+            processCompleteMessage(current, true);
+          }
+          return '';
+        });
+      }, 2000);
+      
+      setUserMessageTimer(newTimer);
+      
+    } else {
+      // Manejar mensajes del asistente de manera similar
+      setCurrentAssistantMessage(prev => {
+        if (trimmedMessage.length > prev.length && trimmedMessage.includes(prev)) {
+          return trimmedMessage;
+        }
+        if (!trimmedMessage.includes(prev) && !prev.includes(trimmedMessage)) {
+          return trimmedMessage;
+        }
+        return prev;
+      });
+      
+      if (assistantMessageTimer) {
+        clearTimeout(assistantMessageTimer);
+      }
+      
+      const newTimer = setTimeout(() => {
+        setCurrentAssistantMessage(current => {
+          if (current.trim()) {
+            processCompleteMessage(current, false);
+          }
+          return '';
+        });
+      }, 2000);
+      
+      setAssistantMessageTimer(newTimer);
+    }
+  }, [processCompleteMessage, userMessageTimer, assistantMessageTimer]);
+  
+  // Limpiar timers al desmontar
+  useEffect(() => {
+    return () => {
+      if (userMessageTimer) clearTimeout(userMessageTimer);
+      if (assistantMessageTimer) clearTimeout(assistantMessageTimer);
+    };
+  }, [userMessageTimer, assistantMessageTimer]);
+  
+  // Procesar mensajes pendientes cuando cambie el estado del agente
+  const [prevState, setPrevState] = useState<AgentState>('disconnected');
+  
+  useEffect(() => {
+    // Si el agente pasa de 'thinking' a 'speaking', procesar mensaje del usuario pendiente
+    if (prevState === 'thinking' && agentState === 'speaking' && currentUserMessage.trim()) {
+      if (userMessageTimer) clearTimeout(userMessageTimer);
+      processCompleteMessage(currentUserMessage, true);
+      setCurrentUserMessage('');
+    }
+    
+    // Si el agente pasa de 'speaking' a 'listening', procesar mensaje del asistente pendiente
+    if (prevState === 'speaking' && agentState === 'listening' && currentAssistantMessage.trim()) {
+      if (assistantMessageTimer) clearTimeout(assistantMessageTimer);
+      processCompleteMessage(currentAssistantMessage, false);
+      setCurrentAssistantMessage('');
+    }
+    
+    setPrevState(agentState);
+  }, [agentState, prevState, currentUserMessage, currentAssistantMessage, userMessageTimer, assistantMessageTimer, processCompleteMessage]);
 
   useEffect(() => {
     if (!room) {
@@ -288,7 +407,9 @@ function ConversationCapture(props: {
         if (!text) return;
 
         const isFromUser = participant?.identity === room.localParticipant?.identity;
-        processUniqueMessage(text, isFromUser || false);
+        
+        // Usar la nueva lógica incremental en lugar de procesar inmediatamente
+        handleIncrementalMessage(text, isFromUser || false);
         
       } catch (error) {
         console.error('Error processing transcription:', error);
@@ -305,7 +426,7 @@ function ConversationCapture(props: {
       onCaptureStateChange?.(false);
     };
 
-  }, [room, processUniqueMessage, onCaptureStateChange]);
+  }, [room, handleIncrementalMessage, onCaptureStateChange]);
 
   return null; // Este componente no renderiza nada
 }
