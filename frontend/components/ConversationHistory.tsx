@@ -27,6 +27,58 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showTimestamps, setShowTimestamps] = useState(false);
+  
+  // Función para limpiar mensajes duplicados o muy similares
+  const cleanMessages = (msgs: ConversationMessage[]) => {
+    if (msgs.length === 0) return msgs;
+    
+    const cleaned: ConversationMessage[] = [];
+    
+    for (const msg of msgs) {
+      const lastMsg = cleaned[cleaned.length - 1];
+      
+      // Si es el primer mensaje, agregarlo
+      if (!lastMsg) {
+        cleaned.push(msg);
+        continue;
+      }
+      
+      // Si es del mismo tipo y muy similar, omitir
+      if (lastMsg.type === msg.type) {
+        const similarity = calculateSimilarity(lastMsg.content, msg.content);
+        if (similarity > 0.8) {
+          // Reemplazar con el mensaje más largo (más completo)
+          if (msg.content.length > lastMsg.content.length) {
+            cleaned[cleaned.length - 1] = msg;
+          }
+          continue;
+        }
+      }
+      
+      // Si pasa todas las verificaciones, agregarlo
+      cleaned.push(msg);
+    }
+    
+    return cleaned;
+  };
+  
+  // Función para calcular similitud entre dos strings
+  const calculateSimilarity = (str1: string, str2: string): number => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    
+    if (longer.length === 0) return 1.0;
+    
+    // Si el string más corto está contenido en el más largo, alta similitud
+    if (longer.includes(shorter)) {
+      return shorter.length / longer.length;
+    }
+    
+    return 0;
+  };
+  
+  // Limpiar mensajes antes de mostrar
+  const cleanedMessages = cleanMessages(messages);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('es-CO', { 
@@ -44,8 +96,8 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
     });
   };
 
-  // Agrupar mensajes por fecha
-  const groupedMessages = messages.reduce((acc, message) => {
+  // Agrupar mensajes por fecha (usando mensajes limpios)
+  const groupedMessages = cleanedMessages.reduce((acc, message) => {
     const dateKey = message.timestamp.toDateString();
     if (!acc[dateKey]) {
       acc[dateKey] = [];
@@ -54,7 +106,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
     return acc;
   }, {} as Record<string, ConversationMessage[]>);
 
-  if (messages.length === 0) {
+  if (cleanedMessages.length === 0) {
     return (
       <section className={`w-full py-6 ${className}`}>
         <div className="container mx-auto px-4">
@@ -89,7 +141,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
                   Historial de Conversaciones
                 </CardTitle>
                 <span className="bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded-full">
-                  {messages.length} mensaje{messages.length !== 1 ? 's' : ''}
+                  {cleanedMessages.length} mensaje{cleanedMessages.length !== 1 ? 's' : ''}
                 </span>
               </div>
               
@@ -212,14 +264,14 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
               )}
             </AnimatePresence>
             
-            {!isExpanded && messages.length > 0 && (
+            {!isExpanded && cleanedMessages.length > 0 && (
               <div className="text-center py-4">
                 <p className="text-sm text-muted-foreground mb-3">
-                  Última conversación hace {Math.floor((Date.now() - messages[messages.length - 1].timestamp.getTime()) / (1000 * 60))} minutos
+                  Última conversación hace {Math.floor((Date.now() - cleanedMessages[cleanedMessages.length - 1].timestamp.getTime()) / (1000 * 60))} minutos
                 </p>
                 <div className="text-xs text-muted-foreground mb-3 bg-muted/50 px-3 py-2 rounded-lg max-w-md mx-auto">
                   <div className="flex items-center justify-center space-x-2">
-                    {messages.slice(-1).map(msg => (
+                    {cleanedMessages.slice(-1).map(msg => (
                       <div key={msg.id} className="flex items-center space-x-2">
                         {msg.type === 'user' ? (
                           <User className="h-3 w-3 text-secondary" />
