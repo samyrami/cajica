@@ -10,7 +10,7 @@ import {
   AgentState,
   DisconnectButton,
 } from "@livekit/components-react";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MediaDeviceFailure } from "livekit-client";
 import type { ConnectionDetails } from "../app/api/connection-details/route";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
@@ -72,7 +72,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     if (agentState === "speaking" && onResponse) {
       onResponse("Procesando su consulta sobre los objetivos estratégicos de la Gobernación de Santander...");
     }
-  }, [agentState]); // Solo dependemos del estado del agente
+  }, [agentState, onResponse]); // Incluir onResponse en las dependencias
 
   // Debug logs y mensaje de bienvenida
   useEffect(() => {
@@ -88,7 +88,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
       }, 1000); // Delay para asegurar que la conexión esté estable
       setHasAddedWelcomeMessage(true);
     }
-  }, [agentState, hasAddedWelcomeMessage]);
+  }, [agentState, hasAddedWelcomeMessage, onAddMessage]);
 
   // Manejar transiciones de estado para agregar mensajes relevantes
   useEffect(() => {
@@ -112,7 +112,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
       
       setLastProcessedState(agentState);
     }
-  }, [agentState, lastProcessedState, hasAddedWelcomeMessage]); // Incluir hasAddedWelcomeMessage para control
+  }, [agentState, lastProcessedState, hasAddedWelcomeMessage, onAddMessage]); // Incluir onAddMessage en las dependencias
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -184,24 +184,6 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
               publishDefaults: {
                 videoSimulcastLayers: []
               },
-              // Configuraciones para mejorar conectividad y evitar panics
-              rtcConfig: {
-                iceTransportPolicy: 'all',
-                bundlePolicy: 'max-compat', // Cambiado para mayor compatibilidad
-                rtcpMuxPolicy: 'require',
-                iceCandidatePoolSize: 10,
-                iceServers: [
-                  { urls: 'stun:stun.l.google.com:19302' },
-                  { urls: 'stun:stun1.l.google.com:19302' },
-                  { urls: 'stun:stun2.l.google.com:19302' },
-                  // Servidores TURN públicos como fallback
-                  {
-                    urls: 'turn:openrelay.metered.ca:80',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                  }
-                ]
-              },
               // Timeouts más largos y configuraciones de estabilidad
               disconnectOnPageLeave: true,
               stopLocalTrackOnUnpublish: true,
@@ -210,8 +192,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
                 nextRetryDelayInMs: (context) => {
                   // Incrementar delay progresivamente
                   return Math.min(1000 * Math.pow(2, context.retryCount), 30000);
-                },
-                maxRetries: 3
+                }
               }
             }}
             className="flex flex-col items-center space-y-6"
@@ -234,10 +215,11 @@ function SimpleVoiceAssistant(props: {
   onStateChange: (state: AgentState) => void;
 }) {
   const { state, audioTrack } = useVoiceAssistant();
+  const { onStateChange } = props;
   
   useEffect(() => {
-    props.onStateChange(state);
-  }, [state]); // Solo dependemos del estado, no del objeto props completo
+    onStateChange(state);
+  }, [state, onStateChange]); // Incluir onStateChange en las dependencias
 
   return (
     <div className="h-[300px] max-w-[90vw] mx-auto">
