@@ -9,14 +9,18 @@ import {
   VoiceAssistantControlBar,
   AgentState,
   DisconnectButton,
+  useRoomContext,
+  useDataChannel,
+  useTrackTranscription,
 } from "@livekit/components-react";
 import { useCallback, useEffect, useState } from "react";
-import { MediaDeviceFailure } from "livekit-client";
+import { MediaDeviceFailure, RoomEvent, DataPacket_Kind, TrackReference } from "livekit-client";
 import type { ConnectionDetails } from "../app/api/connection-details/route";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import { CloseIcon } from "@/components/CloseIcon";
 // import { useKrispNoiseFilter } from "@livekit/components-react/krisp"; // Comentado temporalmente para evitar bucles
 import { Card, CardContent } from "@/components/ui/card";
+import { useConversationCapture } from "@/hooks/useConversationCapture";
 
 interface ConversationalAgentProps {
   onResponse?: (response: string) => void;
@@ -62,17 +66,43 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     }
   }, []);
 
+  // Usar hook personalizado para capturar conversaciones
+  const { isCapturing } = useConversationCapture({
+    onUserMessage: useCallback((message: string) => {
+      console.log('User message captured:', message);
+      setLastUserTranscript(message);
+      if (onAddMessage) {
+        onAddMessage('user', message);
+      }
+    }, [onAddMessage]),
+    
+    onAssistantMessage: useCallback((message: string) => {
+      console.log('Assistant message captured:', message);
+      if (onResponse) {
+        onResponse(message);
+      }
+      if (onAddMessage) {
+        onAddMessage('assistant', message);
+      }
+    }, [onResponse, onAddMessage]),
+    
+    onError: useCallback((error: Error) => {
+      console.error('Conversation capture error:', error);
+    }, [])
+  });
 
   // State para controlar cuándo agregar mensajes al historial
   const [lastProcessedState, setLastProcessedState] = useState<AgentState>("disconnected");
   const [hasAddedWelcomeMessage, setHasAddedWelcomeMessage] = useState(false);
+  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
+  const [lastUserTranscript, setLastUserTranscript] = useState<string>('');
 
-  // Manejar respuestas de voz sin bucles
+  // Solo manejar estado inicial para respuesta genérica si no hay transcripciones
   useEffect(() => {
-    if (agentState === "speaking" && onResponse) {
+    if (agentState === "speaking" && !lastUserTranscript && onResponse) {
       onResponse("Procesando su consulta sobre los objetivos estratégicos de la Gobernación de Santander...");
     }
-  }, [agentState, onResponse]); // Incluir onResponse en las dependencias
+  }, [agentState, onResponse, lastUserTranscript]);
 
   // Debug logs y mensaje de bienvenida
   useEffect(() => {
@@ -90,29 +120,13 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     }
   }, [agentState, hasAddedWelcomeMessage, onAddMessage]);
 
-  // Manejar transiciones de estado para agregar mensajes relevantes
+  // Manejar transiciones de estado simplificadas
   useEffect(() => {
     if (lastProcessedState !== agentState) {
       console.log('State transition:', lastProcessedState, '->', agentState);
-      
-      // Solo agregar mensajes si onAddMessage está disponible y en transiciones válidas
-      if (onAddMessage && hasAddedWelcomeMessage) {
-        if (lastProcessedState === "listening" && agentState === "thinking") {
-          // Usuario acaba de hablar
-          console.log('User spoke - adding user message');
-          onAddMessage('user', 'Consulta sobre objetivos estratégicos de Santander');
-        }
-        
-        if (lastProcessedState === "thinking" && agentState === "speaking") {
-          // Asistente va a responder
-          console.log('Assistant responding - adding response message');
-          onAddMessage('assistant', 'Procesando su consulta...');
-        }
-      }
-      
       setLastProcessedState(agentState);
     }
-  }, [agentState, lastProcessedState, hasAddedWelcomeMessage, onAddMessage]); // Incluir onAddMessage en las dependencias
+  }, [agentState, lastProcessedState]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -127,7 +141,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
             </p>
             
             {/* Mostrar estado de conexión */}
-            <div className="mt-3 text-sm">
+            <div className="mt-3 text-sm flex items-center justify-center space-x-3">
               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                 agentState === 'listening' ? 'bg-green-100 text-green-800' :
                 agentState === 'thinking' ? 'bg-yellow-100 text-yellow-800' :
@@ -141,6 +155,12 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
                  agentState === 'connecting' ? '🟠 Conectando...' :
                  '⚫ Desconectado'}
               </span>
+              
+              {isCapturing && agentState !== 'disconnected' && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  📁 Guardando conversación
+                </span>
+              )}
             </div>
             
             {connectionError && (
@@ -197,7 +217,9 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
             }}
             className="flex flex-col items-center space-y-6"
           >
-            <SimpleVoiceAssistant onStateChange={setAgentState} />
+            <SimpleVoiceAssistant 
+              onStateChange={setAgentState}
+            />
             <ControlBar
               onConnectButtonClicked={onConnectButtonClicked}
               agentState={agentState}
@@ -219,7 +241,7 @@ function SimpleVoiceAssistant(props: {
   
   useEffect(() => {
     onStateChange(state);
-  }, [state, onStateChange]); // Incluir onStateChange en las dependencias
+  }, [state, onStateChange]);
 
   return (
     <div className="h-[300px] max-w-[90vw] mx-auto">
