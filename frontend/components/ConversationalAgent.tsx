@@ -10,17 +10,14 @@ import {
   AgentState,
   DisconnectButton,
   useRoomContext,
-  useDataChannel,
-  useTrackTranscription,
 } from "@livekit/components-react";
 import { useCallback, useEffect, useState } from "react";
-import { MediaDeviceFailure, RoomEvent, DataPacket_Kind, TrackReference } from "livekit-client";
+import { MediaDeviceFailure } from "livekit-client";
 import type { ConnectionDetails } from "../app/api/connection-details/route";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import { CloseIcon } from "@/components/CloseIcon";
 // import { useKrispNoiseFilter } from "@livekit/components-react/krisp"; // Comentado temporalmente para evitar bucles
 import { Card, CardContent } from "@/components/ui/card";
-import { useConversationCapture } from "@/hooks/useConversationCapture";
 
 interface ConversationalAgentProps {
   onResponse?: (response: string) => void;
@@ -66,35 +63,31 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     }
   }, []);
 
-  // Usar hook personalizado para capturar conversaciones
-  const { isCapturing } = useConversationCapture({
-    onUserMessage: useCallback((message: string) => {
-      console.log('User message captured:', message);
-      setLastUserTranscript(message);
-      if (onAddMessage) {
-        onAddMessage('user', message);
-      }
-    }, [onAddMessage]),
-    
-    onAssistantMessage: useCallback((message: string) => {
-      console.log('Assistant message captured:', message);
-      if (onResponse) {
-        onResponse(message);
-      }
-      if (onAddMessage) {
-        onAddMessage('assistant', message);
-      }
-    }, [onResponse, onAddMessage]),
-    
-    onError: useCallback((error: Error) => {
-      console.error('Conversation capture error:', error);
-    }, [])
-  });
+  // Estado para captura de conversaciones
+  const [isCapturing, setIsCapturing] = useState(false);
+  
+  // Handlers para captura de mensajes
+  const handleUserMessage = useCallback((message: string) => {
+    console.log('User message captured:', message);
+    setLastUserTranscript(message);
+    if (onAddMessage) {
+      onAddMessage('user', message);
+    }
+  }, [onAddMessage]);
+  
+  const handleAssistantMessage = useCallback((message: string) => {
+    console.log('Assistant message captured:', message);
+    if (onResponse) {
+      onResponse(message);
+    }
+    if (onAddMessage) {
+      onAddMessage('assistant', message);
+    }
+  }, [onResponse, onAddMessage]);
 
   // State para controlar cuándo agregar mensajes al historial
   const [lastProcessedState, setLastProcessedState] = useState<AgentState>("disconnected");
   const [hasAddedWelcomeMessage, setHasAddedWelcomeMessage] = useState(false);
-  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
   const [lastUserTranscript, setLastUserTranscript] = useState<string>('');
 
   // Solo manejar estado inicial para respuesta genérica si no hay transcripciones
@@ -217,6 +210,11 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
             }}
             className="flex flex-col items-center space-y-6"
           >
+            <ConversationCapture
+              onUserMessage={handleUserMessage}
+              onAssistantMessage={handleAssistantMessage}
+              onCaptureStateChange={setIsCapturing}
+            />
             <SimpleVoiceAssistant 
               onStateChange={setAgentState}
             />
@@ -232,6 +230,85 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     </div>
   );
 };
+
+// Componente para capturar conversaciones dentro del contexto de LiveKit
+function ConversationCapture(props: {
+  onUserMessage?: (message: string) => void;
+  onAssistantMessage?: (message: string) => void;
+  onCaptureStateChange?: (isCapturing: boolean) => void;
+}) {
+  const room = useRoomContext();
+  const { onUserMessage, onAssistantMessage, onCaptureStateChange } = props;
+  const [lastProcessedMessage, setLastProcessedMessage] = useState<string>('');
+  
+  // Función para procesar mensajes únicos
+  const processUniqueMessage = useCallback((message: string, isUser: boolean) => {
+    const trimmedMessage = message.trim();
+    
+    // Evitar duplicados
+    if (trimmedMessage === lastProcessedMessage || !trimmedMessage) {
+      return;
+    }
+
+    console.log(`Processing ${isUser ? 'user' : 'assistant'} message:`, trimmedMessage);
+    setLastProcessedMessage(trimmedMessage);
+
+    if (isUser && onUserMessage) {
+      onUserMessage(trimmedMessage);
+    } else if (!isUser && onAssistantMessage) {
+      onAssistantMessage(trimmedMessage);
+    }
+  }, [lastProcessedMessage, onUserMessage, onAssistantMessage]);
+
+  useEffect(() => {
+    if (!room) {
+      onCaptureStateChange?.(false);
+      return;
+    }
+
+    onCaptureStateChange?.(true);
+    console.log('Starting conversation capture...');
+
+    // Capturar transcripciones nativas de LiveKit
+    const handleTranscription = (segments: Array<{text: string}>, participant?: {identity: string}) => {
+      try {
+        console.log('Transcription event:', { 
+          segments, 
+          participantIdentity: participant?.identity,
+          localParticipantIdentity: room.localParticipant?.identity
+        });
+
+        if (!segments || segments.length === 0) return;
+
+        const text = segments
+          .map(segment => segment.text || '')
+          .join(' ')
+          .trim();
+
+        if (!text) return;
+
+        const isFromUser = participant?.identity === room.localParticipant?.identity;
+        processUniqueMessage(text, isFromUser || false);
+        
+      } catch (error) {
+        console.error('Error processing transcription:', error);
+      }
+    };
+
+    // Registrar event listeners
+    room.on('transcriptionReceived', handleTranscription);
+
+    // Cleanup
+    return () => {
+      console.log('Stopping conversation capture...');
+      room.off('transcriptionReceived', handleTranscription);
+      onCaptureStateChange?.(false);
+    };
+
+  }, [room, processUniqueMessage, onCaptureStateChange]);
+
+  return null; // Este componente no renderiza nada
+}
 
 function SimpleVoiceAssistant(props: {
   onStateChange: (state: AgentState) => void;

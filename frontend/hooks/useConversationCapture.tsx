@@ -75,8 +75,9 @@ export function useConversationCapture({
     };
 
     // Capturar datos del canal de datos
-    const handleDataPacket = (payload: Uint8Array, participant: any, kind: DataPacket_Kind) => {
-      if (kind !== DataPacket_Kind.RELIABLE) return;
+    const handleDataPacket = (payload: Uint8Array, participant?: any, kind?: DataPacket_Kind) => {
+      // Solo procesar paquetes confiables
+      if (kind === DataPacket_Kind.LOSSY) return;
 
       try {
         const decoder = new TextDecoder();
