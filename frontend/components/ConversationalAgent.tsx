@@ -155,7 +155,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
                     <li>Revisa tu conexión a internet</li>
                     <li>Si estás en una red corporativa, puede haber restricciones de firewall</li>
                     <li><strong>Problema de audio:</strong> Verifica permisos de micrófono en el navegador</li>
-                    <li>Abre F12 > Consola para ver errores de audio</li>
+                    <li>Abre F12 &gt; Consola para ver errores de audio</li>
                   </ul>
                 </div>
               </div>
