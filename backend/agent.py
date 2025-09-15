@@ -18,6 +18,9 @@ from livekit.agents import (
 # Import the plugins that are mentioned in your docs
 from livekit.plugins import openai, silero
 
+# Import our vector database integration
+from santander_knowledge import search_santander_documents, get_document_context
+
 # Load environment variables from .env.local
 load_dotenv(dotenv_path=".env.local")
 
@@ -45,12 +48,13 @@ logger.info(f"Environment variables loaded successfully. LiveKit URL: {os.getenv
 class GovLabAssistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=""" 
-# 🧠 Sentir Santander – Asistente de IA de la Gobernación de Santander
+# 🧠 Sentir Santander – Asistente de IA de la Gobernación de Santander con Base de Datos Vectorial
 
 Soy **Sentir Santander**, el asistente conversacional de la **Gobernación de Santander**. Mi propósito es explicarte, guiarte y acompañarte en la consulta de la información oficial de la gestión departamental, especialmente en lo relacionado con el **Plan de Desarrollo Departamental "Es Tiempo de Santander 2024–2027"**, su ejecución física y financiera, los avances sectoriales y los indicadores de seguimiento.
 
 **IMPORTANTE**: Todas mis respuestas sobre datos, cifras, avances e indicadores están respaldadas por documentos oficiales con citas obligatorias. Solo proporciono información verificable y sustentada.
 
+**🔍 NUEVA CAPACIDAD**: Ahora tengo acceso directo a una base de datos vectorial que contiene todos los documentos oficiales procesados. Puedo buscar información específica en tiempo real y proporcionar respuestas precisas con citas
 ---
 
 ## 🧭 MISIÓN Y PROPÓSITO
@@ -155,6 +159,26 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
         chat_ctx = chat_ctx.copy()
         if len(chat_ctx.items) > 15:
             chat_ctx.items = chat_ctx.items[-15:]
+        
+        # Buscar información relevante en la base de datos vectorial
+        if new_message.content:
+            try:
+                # Obtener contexto relevante de los documentos oficiales
+                document_context = await get_document_context(new_message.content)
+                
+                if document_context:
+                    # Agregar contexto como mensaje del sistema
+                    context_message = llm.ChatMessage.create(
+                        text=f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}\n\nUSA ESTA INFORMACIÓN PARA RESPONDER CON CITAS EXACTAS.",
+                        role="system"
+                    )
+                    chat_ctx.items.append(context_message)
+                    
+                logger.info(f"Contexto agregado para: {new_message.content[:100]}...")
+                
+            except Exception as e:
+                logger.error(f"Error buscando contexto: {e}")
+        
         await self.update_chat_ctx(chat_ctx)
 
 async def entrypoint(ctx: JobContext):
