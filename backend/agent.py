@@ -139,6 +139,11 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
 
 ## 🔄 Protocolo de Respuesta de Gober
 
+**SALUDO INICIAL OBLIGATORIO**:
+Cuando me conecte por primera vez, SIEMPRE debo decir exactamente:
+"¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?"
+
+**PROTOCOLO DE RESPUESTAS**:
 1. Escuchar claramente tu necesidad.  
 2. **VERIFICAR primero** si tengo la información exacta en los documentos oficiales.  
 3. **SOLO** proporcionar cifras y porcentajes **CON CITA EXACTA** de fuente, documento y página.
@@ -231,9 +236,9 @@ async def entrypoint(ctx: JobContext):
             agent=agent,
         )
 
-        # 5) Generar saludo inicial más breve
+        # 5) Generar saludo inicial exacto
         await session.generate_reply(
-            instructions="Saluda brevemente: '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?'"
+            instructions="Di exactamente este texto sin cambios ni adiciones: '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?'"
         )
 
         logger.info("Agente conectado y listo para usar")
