@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script de Optimización del Agente Sentir Santander
+Script de Optimización del Agente Gober
 ==================================================
 
 Este script optimiza el rendimiento del agente:
@@ -126,7 +126,7 @@ def display_optimization_tips():
 
 async def main():
     """Función principal de optimización"""
-    print("🚀 OPTIMIZACIÓN DEL AGENTE SENTIR SANTANDER")
+    print("🚀 OPTIMIZACIÓN DEL AGENTE GOBER")
     print("=" * 50)
     
     # 1. Verificar entorno

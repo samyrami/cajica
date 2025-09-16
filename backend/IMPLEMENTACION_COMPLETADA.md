@@ -2,7 +2,7 @@
 
 ## 🎉 Estado del Proyecto: COMPLETADO
 
-Se ha implementado exitosamente una base de datos vectorial local para el proyecto **Sentir Santander**, permitiendo que el agente conversacional acceda a información específica y actualizada de todos los documentos oficiales mediante búsqueda semántica avanzada.
+Se ha implementado exitosamente una base de datos vectorial local para el proyecto **Gober**, permitiendo que el agente conversacional acceda a información específica y actualizada de todos los documentos oficiales mediante búsqueda semántica avanzada.
 
 ## 🚀 Lo que se Implementó
 
@@ -142,7 +142,7 @@ backend/
 
 ## 🎯 Beneficios Logrados
 
-### Para el Agente Sentir Santander:
+### Para el Agente Gober:
 1. **Respuestas precisas**: Información específica con citas exactas
 2. **Transparencia total**: Todas las respuestas con fuentes oficiales
 3. **Actualización simple**: Solo copiar nuevos archivos y recargar
@@ -197,7 +197,7 @@ python init_database.py --stats --test
 
 **✅ PROYECTO COMPLETADO EXITOSAMENTE**
 
-Se implementó una base de datos vectorial completa que permite al agente **Sentir Santander** acceder a información específica de 676 fragmentos procesados automáticamente desde 4 documentos oficiales de la Gobernación de Santander.
+Se implementó una base de datos vectorial completa que permite al agente **Gober** acceder a información específica de 676 fragmentos procesados automáticamente desde 4 documentos oficiales de Santander Territorio inteligente.
 
 **Capacidades principales:**
 - Búsqueda semántica en tiempo real

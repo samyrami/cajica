@@ -34,7 +34,7 @@ def setup_arg_parser():
     Configura el parser de argumentos de línea de comandos
     """
     parser = argparse.ArgumentParser(
-        description='Inicializar base de datos vectorial de Sentir Santander',
+        description='Inicializar base de datos vectorial de Gober',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Ejemplos de uso:

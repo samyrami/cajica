@@ -1,8 +1,8 @@
-# 🧠 Base de Datos Vectorial - Sentir Santander
+# 🧠 Base de Datos Vectorial - Gober
 
 ## 📋 Descripción
 
-La base de datos vectorial de Sentir Santander permite al agente conversacional acceder a información específica y actualizada de todos los documentos oficiales de la Gobernación de Santander mediante búsqueda semántica avanzada.
+La base de datos vectorial de Gober permite al agente conversacional acceder a información específica y actualizada de todos los documentos oficiales de Santander Territorio inteligente mediante búsqueda semántica avanzada.
 
 ## ✨ Características
 
@@ -258,4 +258,4 @@ Para problemas técnicos o consultas sobre la implementación, revisar:
 
 ---
 
-**Desarrollado para el proyecto Sentir Santander - GovLab Universidad de la Sabana**
+**Desarrollado para el proyecto Gober - GovLab Universidad de la Sabana**

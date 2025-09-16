@@ -1,5 +1,5 @@
 """
-Módulo de Conocimiento para Sentir Santander
+Módulo de Conocimiento para Gober
 ============================================
 
 Este módulo maneja la integración entre el agente conversacional 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class SantanderKnowledge:
     """
     Gestor de conocimiento que integra la base de datos vectorial
-    con el agente conversacional de Sentir Santander
+    con el agente conversacional de Gober
     """
     
     def __init__(self, data_dir: str = "./data", db_dir: str = "./chroma_db"):

@@ -1,5 +1,5 @@
 """
-Gestor de Base de Datos Vectorial para Sentir Santander
+Gestor de Base de Datos Vectorial para Gober
 ======================================================
 
 Este módulo maneja la creación, carga y consulta de documentos 
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class SantanderVectorDB:
     """
-    Gestor de base de datos vectorial para documentos de la Gobernación de Santander
+    Gestor de base de datos vectorial para documentos de Santander Territorio inteligente
     """
     
     def __init__(self, data_dir: str = "./data", db_dir: str = "./chroma_db"):
