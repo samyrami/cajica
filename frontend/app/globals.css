@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Agente de Voz Gobernación de Santander - Sistema de Diseño Institucional */
+/* Gober - Santander Territorio inteligente - Sistema de Diseño Institucional */
 
 @layer base {
   :root {
@@ -16,12 +16,12 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
 
-    /* Verde institucional Santander */
+    /* Verde institucional Santander Territorio inteligente */
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
     --primary-light: 142 76% 90%;
     
-    /* Amarillo institucional Santander */
+    /* Amarillo institucional Santander Territorio inteligente */
     --secondary: 48 100% 67%;
     --secondary-foreground: 0 0% 20%;
     --secondary-light: 48 100% 95%;

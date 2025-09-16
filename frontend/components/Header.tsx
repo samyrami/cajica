@@ -49,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
         
         <div className="text-center mt-4">
           <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-foreground font-institutional">
-            Asistente Virtual de la Gobernación de Santander
+            Gober - Santander Territorio inteligente
           </h1>
           <p className="text-muted-foreground mt-2 text-sm md:text-base">
             Consulta transparente sobre objetivos estratégicos y avances institucionales

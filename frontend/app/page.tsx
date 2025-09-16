@@ -50,7 +50,7 @@ export default function Page() {
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Este asistente de voz proporciona información verificada y actualizada sobre los objetivos 
-                    estratégicos de la Gobernación de Santander. Desarrollado en colaboración con la Universidad 
+                    estratégicos de Santander Territorio inteligente. Desarrollado en colaboración con la Universidad 
                     de La Sabana y el Laboratorio de Gobierno para promover la transparencia y el acceso ciudadano 
                     a la información pública.
                   </p>
@@ -155,7 +155,7 @@ export default function Page() {
                       Nota Importante
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      La información proporcionada es oficial y verificada por la Gobernación de Santander. 
+                      La información proporcionada es oficial y verificada por Santander Territorio inteligente. 
                       Para consultas específicas o trámites administrativos, contacte directamente las oficinas 
                       departamentales correspondientes.
                     </p>
@@ -171,7 +171,7 @@ export default function Page() {
       <footer className="border-t border-border bg-muted/30 py-6 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 Gobernación de Santander - Universidad de La Sabana - Laboratorio de Gobierno
+            © 2024 Santander Territorio inteligente - Universidad de La Sabana - Laboratorio de Gobierno
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Comprometidos con la transparencia y la modernización del servicio público

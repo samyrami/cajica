@@ -1,12 +1,12 @@
-# ✅ Transformación Completa - Asistente Virtual Gobernación de Santander
+# ✅ Transformación Completa - Gober - Santander Territorio inteligente
 
 ## Resumen de Cambios
 
-He transformado exitosamente tu aplicación para implementar el nuevo diseño institucional de la Gobernación de Santander, manteniendo intacta toda la funcionalidad de LiveKit.
+He transformado exitosamente tu aplicación para implementar el nuevo diseño institucional de Santander Territorio inteligente, manteniendo intacta toda la funcionalidad de LiveKit.
 
 ### 🎯 Objetivos Cumplidos
 
-✅ **Diseño Institucional**: Implementado con colores, tipografía y elementos visuales de Santander  
+✅ **Diseño Institucional**: Implementado con colores, tipografía y elementos visuales de Santander Territorio inteligente  
 ✅ **Funcionalidad LiveKit**: 100% preservada (reconocimiento de voz, síntesis, visualizadores)  
 ✅ **Responsive Design**: Adaptado para móviles, tablets y escritorio  
 ✅ **Componentes Modulares**: Sistema de UI components reutilizable  
@@ -38,7 +38,7 @@ He transformado exitosamente tu aplicación para implementar el nuevo diseño in
 ### 🎨 Características del Nuevo Diseño
 
 #### Identidad Visual
-- Colores oficiales: Verde Santander (#2d5016) y Amarillo (#fcd34d)
+- Colores oficiales: Verde Santander Territorio inteligente (#2d5016) y Amarillo (#fcd34d)
 - Tipografía: Public Sans (400, 500, 600, 700)
 - Gradientes y sombras institucionales
 
@@ -86,7 +86,7 @@ Asegúrate de tener estas imágenes en `public/images/`:
 
 La aplicación ahora presenta:
 
-1. **Imagen Institucional Profesional**: Design system completo de Santander
+1. **Imagen Institucional Profesional**: Design system completo de Santander Territorio inteligente
 2. **Experiencia de Usuario Mejorada**: Interface clara y moderna
 3. **Funcionalidad Completa**: Todo el poder de LiveKit intacto
 4. **Responsive**: Funciona perfectamente en todos los dispositivos

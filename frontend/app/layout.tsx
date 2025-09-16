@@ -10,8 +10,8 @@ const publicSans = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Asistente Virtual - Gobernación de Santander",
-  description: "Consulta transparente sobre objetivos estratégicos y avances institucionales de la Gobernación de Santander",
+  title: "Gober - Santander Territorio inteligente",
+  description: "Consulta transparente sobre objetivos estratégicos y avances institucionales de Santander Territorio inteligente",
 };
 
 export default function RootLayout({
