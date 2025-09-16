@@ -169,7 +169,7 @@ const StatsSection: React.FC = () => {
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
             Seguimiento transparente del progreso promedio de indicadores por dependencias de la Gobernación de Santander, 
-            basado en el Plan de Desarrollo Departamental "Es Tiempo de Santander 2024-2027"
+            basado en el Plan de Desarrollo Departamental &ldquo;Es Tiempo de Santander 2024-2027&rdquo;
           </p>
           <div className="mt-4 inline-flex items-center space-x-4 bg-primary/10 px-6 py-3 rounded-lg">
             <div className="text-center">
@@ -249,7 +249,7 @@ const StatsSection: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
-                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} dependencias del PDD "Es Tiempo de Santander"
+                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} dependencias del PDD &ldquo;Es Tiempo de Santander&rdquo;
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 Promedio general de avance de todos los indicadores: {totalProgress.toFixed(1)}% • Indicadores completados: {departmentData.reduce((sum, dept) => sum + dept.completedIndicators, 0)}
