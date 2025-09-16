@@ -165,10 +165,11 @@ const StatsSection: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground font-institutional mb-4">
-            Avances en Objetivos Estratégicos 2025 - 25% de Progreso General
+            Avances en Objetivos Estratégicos 2025 - Promedio del 25% de Progreso General
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Seguimiento transparente del progreso uniforme por dependencias de la Gobernación de Santander
+            Seguimiento transparente del progreso promedio de indicadores por dependencias de la Gobernación de Santander, 
+            basado en el Plan de Desarrollo Departamental "Es Tiempo de Santander 2024-2027"
           </p>
           <div className="mt-4 inline-flex items-center space-x-4 bg-primary/10 px-6 py-3 rounded-lg">
             <div className="text-center">
@@ -196,9 +197,12 @@ const StatsSection: React.FC = () => {
                   `}>
                     {dept.icon}
                   </div>
-                  <span className="text-2xl font-bold text-foreground">
-                    {dept.averageProgress.toFixed(1)}%
-                  </span>
+                  <div className="text-right">
+                    <span className="text-2xl font-bold text-foreground">
+                      {dept.averageProgress.toFixed(1)}%
+                    </span>
+                    <div className="text-xs text-muted-foreground">promedio</div>
+                  </div>
                 </div>
                 <CardTitle className="text-sm font-medium text-foreground leading-tight">
                   {dept.name}
@@ -245,10 +249,13 @@ const StatsSection: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
-                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} dependencias
+                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} dependencias del PDD "Es Tiempo de Santander"
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
-                Promedio general de avance: {totalProgress.toFixed(1)}% • Total completados: {departmentData.reduce((sum, dept) => sum + dept.completedIndicators, 0)}
+                Promedio general de avance de todos los indicadores: {totalProgress.toFixed(1)}% • Indicadores completados: {departmentData.reduce((sum, dept) => sum + dept.completedIndicators, 0)}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground font-medium">
+                📊 Los porcentajes mostrados representan el promedio de avance por dependencia • Fuente: Informes oficiales de gestión
               </div>
             </CardContent>
           </Card>
