@@ -111,11 +111,12 @@ En total: **17 sectores, 98 metas de resultado, 106 proyectos estratégicos, 375
 
 Cada Secretaría y entidad descentralizada reporta avances físicos y financieros. Ejemplos:
 
-- **TIC**: 52,7% de avance físico; ejecución financiera 23,7%.  
-- **Educación**: 46,8% de avance físico; 94,8% de ejecución presupuestal.  
-- **Indersantander**: 40,7% de avance físico; 100% de ejecución presupuestal.  
-- **Infraestructura**: 34,8% de avance físico; retos en obras de largo plazo.  
-- **Salud**: 29,4% de avance físico; compromisos presupuestales en 30,9%.  
+- **Secretaría de TIC**: 48.8% de avance físico promedio; 10 indicadores totales, 3 completados.  
+- **Secretaría de Educación**: 46.8% de avance físico promedio; 94.8% de ejecución presupuestal; 21 indicadores totales, 8 completados.  
+- **Indersantander**: 43.65% de avance físico promedio; 14 indicadores totales, 4 completados.  
+- **Secretaría de Planeación**: 43.02% de avance físico promedio; 19 indicadores totales, 8 completados.
+- **Secretaría de Infraestructura**: 22.8% de avance físico promedio; 53 indicadores totales, 15 completados.
+- **Secretaría de Salud**: 26.89% de avance físico promedio; 54 indicadores totales, 12 completados.
 
 ---
 
@@ -199,25 +200,31 @@ Cuando me conecte por primera vez, SIEMPRE debo decir exactamente:
             try:
                 # Detectar si es una consulta sobre indicadores, metas o resultados
                 query_lower = new_message.content.lower()
-                is_indicator_query = any(keyword in query_lower for keyword in 
-                    ['indicador', 'meta', 'avance', 'progreso', 'resultado', 'ejecución', 'cumplimiento', 'secretaría', 'dependencia'])
+                indicator_keywords = ['indicador', 'meta', 'avance', 'progreso', 'resultado', 'ejecución', 'cumplimiento', 'secretaría', 'dependencia', 'educación', 'salud', 'tic', 'infraestructura', 'planeación', 'completado', 'completados', 'logrado', 'alcanzado']
+                is_indicator_query = any(keyword in query_lower for keyword in indicator_keywords)
                 
-                # Obtener contexto relevante de los documentos oficiales
+                # SIEMPRE obtener contexto de los documentos oficiales
                 document_context = await get_document_context(new_message.content)
                 
                 # Preparar contexto adicional para consultas de indicadores
                 additional_context = ""
                 if is_indicator_query:
-                    additional_context = "\n\nCONTEXTO ADICIONAL SOBRE INDICADORES:\n" + \
-                        "- El promedio general de avance del Plan de Desarrollo es del 25.0%\n" + \
-                        "- Se basa en más de 400 indicadores de 16 dependencias principales\n" + \
-                        "- Los porcentajes mostrados son PROMEDIOS de avance por dependencia\n" + \
-                        "- Dependencias con mejor desempeño: TIC (48.8%), Indersantander (43.65%), Planeación (43.02%)\n" + \
-                        "- Marco: Plan 'Es Tiempo de Santander 2024-2027' con 3 ejes estratégicos"
+                    additional_context = "\n\nDATOS DE REFERENCIA RÁPIDA:\n" + \
+                        "- Secretaría de Educación: 46.8% avance físico, 94.8% ejecución presupuestal, 21 indicadores totales, 8 completados\n" + \
+                        "- Secretaría de TIC: 48.8% avance físico, 10 indicadores totales, 3 completados\n" + \
+                        "- Indersantander: 43.65% avance físico, 14 indicadores totales, 4 completados\n" + \
+                        "- Secretaría de Planeación: 43.02% avance físico, 19 indicadores totales, 8 completados\n" + \
+                        "- Los porcentajes son PROMEDIOS de avance por dependencia del Plan 2024-2027"
                 
-                if document_context or additional_context:
-                    # Agregar contexto como mensaje del sistema
-                    full_context = f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}{additional_context}\n\n⚠️ INSTRUCCIÓN CRÍTICA: USA EXCLUSIVAMENTE ESTA INFORMACIÓN. CITA FUENTE EXACTA (documento, página) para CADA cifra o dato. Si no encuentras la cifra exacta aquí, NO la inventes. Di 'No dispongo de esa cifra específica'."
+                # SIEMPRE agregar contexto (incluso si está vacío, para forzar búsqueda)
+                if document_context or additional_context or True:  # Siempre ejecutar
+                    instruction = ""
+                    if document_context:
+                        instruction = "TIENES ACCESO A INFORMACIÓN OFICIAL DETALLADA. USA ESTA INFORMACIÓN PARA RESPONDER CON DATOS ESPECÍFICOS Y CITAS EXACTAS."
+                    else:
+                        instruction = "SI NO ENCUENTRAS INFORMACIÓN ESPECÍFICA EN LOS DOCUMENTOS, USA LOS DATOS DE REFERENCIA RÁPIDA Y MENCIONA QUE PARA MÁS DETALLES SE PUEDE CONSULTAR LOS INFORMES OFICIALES."
+                    
+                    full_context = f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}{additional_context}\n\n⚠️ INSTRUCCIÓN: {instruction} Siempre cita fuente cuando sea posible."
                     context_message = llm.ChatMessage.create(
                         text=full_context,
                         role="system"
