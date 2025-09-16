@@ -233,7 +233,7 @@ async def entrypoint(ctx: JobContext):
 
         # 5) Generar saludo inicial más breve
         await session.generate_reply(
-            instructions="Saluda brevemente: 'Hola, soy Gober, tu asistente para consultas sobre el Plan de Desarrollo Departamental. ¿En qué puedo ayudarte hoy?'"
+            instructions="Saluda brevemente: '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?'"
         )
 
         logger.info("Agente conectado y listo para usar")

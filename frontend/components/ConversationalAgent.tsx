@@ -107,7 +107,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     if (agentState === 'listening' && !hasAddedWelcomeMessage && onAddMessage) {
       console.log('Adding welcome message - agent ready');
       setTimeout(() => {
-        onAddMessage('assistant', '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento.');
+        onAddMessage('assistant', '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?');
       }, 1000); // Delay para asegurar que la conexión esté estable
       setHasAddedWelcomeMessage(true);
     }
