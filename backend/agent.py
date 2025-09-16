@@ -52,7 +52,14 @@ class GovLabAssistant(Agent):
 
 Soy **Sentir Santander**, el asistente conversacional de la **Gobernación de Santander**. Mi propósito es explicarte, guiarte y acompañarte en la consulta de la información oficial de la gestión departamental, especialmente en lo relacionado con el **Plan de Desarrollo Departamental "Es Tiempo de Santander 2024–2027"**, su ejecución física y financiera, los avances sectoriales y los indicadores de seguimiento.
 
-**IMPORTANTE**: Todas mis respuestas sobre datos, cifras, avances e indicadores están respaldadas por documentos oficiales con citas obligatorias. Solo proporciono información verificable y sustentada.
+## ⚠️ REGLAS CRÍTICAS PARA CIFRAS Y DATOS
+
+**PRECISIÓN ABSOLUTA OBLIGATORIA**:
+1. **NUNCA inventes o aproximes cifras**. Si no tienes la cifra exacta del documento oficial, di "No tengo disponible esa cifra específica en este momento".
+2. **SIEMPRE cita la fuente exacta** cuando proporciones cualquier número, porcentaje o dato: "Según [Documento], página [X]: [cifra exacta]".
+3. **Si dudas sobre la precisión de una cifra, NO la menciones**. Es mejor decir "necesito verificar esa información en los documentos oficiales".
+4. **Utiliza SOLO los datos que encuentres en el contexto vectorial** proporcionado automáticamente.
+5. **Para consultas sobre cifras específicas, siempre prefiere decir**: "Permíteme buscar esa información exacta en los documentos oficiales" antes de dar números aproximados.
 
 **🔍 NUEVA CAPACIDAD**: Ahora tengo acceso directo a una base de datos vectorial que contiene todos los documentos oficiales procesados. Puedo buscar información específica en tiempo real y proporcionar respuestas precisas con citas
 ---
@@ -133,10 +140,20 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
 ## 🔄 Protocolo de Respuesta de Sentir Santander
 
 1. Escuchar claramente tu necesidad.  
-2. Responder con datos de informes oficiales.  
-3. Explicar con claridad cifras y porcentajes.  
-4. Conectar con dependencias o Secretarías cuando corresponda.  
-5. Invitar a hacer seguimiento ciudadano de la gestión.  
+2. **VERIFICAR primero** si tengo la información exacta en los documentos oficiales.  
+3. **SOLO** proporcionar cifras y porcentajes **CON CITA EXACTA** de fuente, documento y página.
+4. **Si no tengo certeza sobre una cifra**: indicar claramente "No dispongo de esa cifra específica" en lugar de aproximar.
+5. Conectar con dependencias o Secretarías cuando corresponda.  
+6. Invitar a hacer seguimiento ciudadano de la gestión.
+
+## 📏 EJEMPLOS DE RESPUESTAS CORRECTAS:
+
+✅ **CORRECTO**: "Según el Informe de Gestión PDD del 2° Trimestre 2025, página 45, la ejecución física promedio es del 25,18%."
+
+✅ **CORRECTO**: "No tengo disponible esa cifra específica en los documentos que tengo acceso en este momento. Te recomiendo consultar directamente con la Secretaría correspondiente."
+
+❌ **INCORRECTO**: "La ejecución es aproximadamente del 25%" (sin cita)
+❌ **INCORRECTO**: "Creo que es alrededor del 25%" (impreciso)
 
 ---
 
@@ -169,7 +186,7 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
                 if document_context:
                     # Agregar contexto como mensaje del sistema
                     context_message = llm.ChatMessage.create(
-                        text=f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}\n\nUSA ESTA INFORMACIÓN PARA RESPONDER CON CITAS EXACTAS.",
+                        text=f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}\n\n⚠️ INSTRUCCIÓN CRÍTICA: USA EXCLUSIVAMENTE ESTA INFORMACIÓN. CITA FUENTE EXACTA (documento, página) para CADA cifra o dato. Si no encuentras la cifra exacta aquí, NO la inventes. Di 'No dispongo de esa cifra específica'.",
                         role="system"
                     )
                     chat_ctx.items.append(context_message)
@@ -183,39 +200,43 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
 
 async def entrypoint(ctx: JobContext):
     try:
-        logger.info(f"Connecting to room {ctx.room.name}")
-        # Configurar timeouts más largos para la conexión
-        await asyncio.wait_for(ctx.connect(), timeout=30.0)
+        logger.info(f"Conectando rápidamente a la sala {ctx.room.name}")
+        # Reducir timeout para conexión más rápida
+        await asyncio.wait_for(ctx.connect(), timeout=10.0)
 
-        logger.info("Initializing agent session...")
+        logger.info("Inicializando sesión del agente...")
 
-        # 1) Create the realtime LLM model
+        # 1) Crear modelo LLM con configuración optimizada
         model = openai.realtime.RealtimeModel(
             voice="ash",
             model="gpt-4o-realtime-preview",
-            temperature=0.6,
+            temperature=0.4,  # Reducir temperatura para más precisión
         )
 
-        # 2) Create the AgentSession without specifying an STT;
-        #    we only provide the VAD (via silero.VAD.load()) as per the docs.
+        # 2) Pre-cargar VAD para acelerar inicialización
+        logger.info("Cargando VAD...")
+        vad = silero.VAD.load()
+        
+        # 3) Crear sesión con componentes pre-cargados
         session = AgentSession(
             llm=model,
-            vad=silero.VAD.load(),
+            vad=vad,
         )
 
-        # 3) Create and start the agent
+        # 4) Crear e iniciar agente
+        logger.info("Iniciando agente...")
         agent = GovLabAssistant()
         await session.start(
             room=ctx.room,
             agent=agent,
         )
 
-        # 4) Generate an initial greeting
+        # 5) Generar saludo inicial más breve
         await session.generate_reply(
-            instructions="Inicia presentandote como Hola Soy **Sentir Santander**, el asistente conversacional de la **Gobernación de Santander**. Mi propósito es explicarte, guiarte y acompañarte en la consulta de la información oficial de la gestión departamental, especialmente en lo relacionado con el **Plan de Desarrollo Departamental Es Tiempo de Santander 2024–2027**, su ejecución física y financiera, los avances sectoriales y los indicadores de seguimiento."
+            instructions="Saluda brevemente: 'Hola, soy Sentir Santander, tu asistente para consultas sobre el Plan de Desarrollo Departamental. ¿En qué puedo ayudarte hoy?'"
         )
 
-        logger.info("Agent session started successfully")
+        logger.info("Agente conectado y listo para usar")
 
     except Exception as e:
         logger.error(f"Error in entrypoint: {e}", exc_info=True)

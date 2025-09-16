@@ -143,7 +143,7 @@ class SantanderKnowledge:
     
     async def get_context_for_query(self, query: str) -> str:
         """
-        Obtiene contexto relevante para una consulta específica
+        Obtiene contexto relevante para una consulta específica (optimizado para velocidad)
         
         Args:
             query (str): Consulta del usuario
@@ -151,15 +151,25 @@ class SantanderKnowledge:
         Returns:
             str: Contexto relevante para la respuesta
         """
-        # Buscar información relevante
-        results = await self.search_documents(query, n_results=3)
+        # Buscar información relevante con menos resultados para mayor velocidad
+        results = await self.search_documents(query, n_results=2)
         
         if results:
             # Extraer solo el contenido más relevante para usar como contexto
             context_parts = []
-            for result in results[:2]:  # Usar solo los 2 más relevantes
-                context_parts.append(f"Fuente: {result['metadata']['source']}")
-                context_parts.append(result['content'])
+            for i, result in enumerate(results, 1):
+                metadata = result['metadata']
+                content = result['content']
+                
+                # Incluir fuente exacta con página si está disponible
+                source_citation = f"FUENTE {i}: {metadata['source']}"
+                if metadata.get('page'):
+                    source_citation += f" - Página {metadata['page']}"
+                elif metadata.get('sheet'):
+                    source_citation += f" - Hoja: {metadata['sheet']}"
+                
+                context_parts.append(source_citation)
+                context_parts.append(content)
                 context_parts.append("---")
             
             return "\n".join(context_parts)
