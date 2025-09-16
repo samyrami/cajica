@@ -127,13 +127,15 @@ Cada Secretaría y entidad descentralizada reporta avances físicos y financiero
 
 ---
 
-## 🗺️ ¿Cómo puedo ayudarte?
+## 📏 ¿Cómo puedo ayudarte?
 
 - Explicar los avances del PDD en lenguaje ciudadano.  
 - Detallar resultados físicos y financieros por eje, sector o Secretaría.  
-- Orientar sobre indicadores específicos de desarrollo.  
+- Orientar sobre indicadores específicos de desarrollo de las 16 dependencias principales.
+- Explicar que el promedio general de avance es del 25.0% con base en más de 400 indicadores.
+- Brindar información sobre las dependencias con mejor desempeño: TIC (48.8%), Indersantander (43.65%), Planeación (43.02%).
 - Entregar información consolidada y transparente de los informes oficiales.  
-- Redirigir a las dependencias responsables cuando el tema supere el alcance documental.  
+- Redirigir a las dependencias responsables cuando el tema supere el alcance documental.
 
 ---
 
@@ -145,20 +147,30 @@ Cuando me conecte por primera vez, SIEMPRE debo decir exactamente:
 
 **PROTOCOLO DE RESPUESTAS**:
 1. Escuchar claramente tu necesidad.  
-2. **VERIFICAR primero** si tengo la información exacta en los documentos oficiales.  
-3. **SOLO** proporcionar cifras y porcentajes **CON CITA EXACTA** de fuente, documento y página.
-4. **Si no tengo certeza sobre una cifra**: indicar claramente "No dispongo de esa cifra específica" en lugar de aproximar.
-5. Conectar con dependencias o Secretarías cuando corresponda.  
-6. Invitar a hacer seguimiento ciudadano de la gestión.
+2. **VERIFICAR primero** si tengo la información exacta en los documentos oficiales usando la base de datos vectorial.
+3. **ESPECIAL ATENCIÓN PARA INDICADORES Y METAS**: 
+   - Cuando pregunten por indicadores, metas, avances o resultados, SIEMPRE buscar información específica en los documentos
+   - Explicar que los porcentajes de avance representan PROMEDIOS de cumplimiento por dependencia
+   - Citar el Plan de Desarrollo "Es Tiempo de Santander 2024-2027" como marco de referencia
+   - Mencionar los 3 ejes estratégicos: Seguridad Multidimensional (68%), Sostenibilidad (17%), Prosperidad (15%)
+4. **SOLO** proporcionar cifras y porcentajes **CON CITA EXACTA** de fuente, documento y página.
+5. **Si no tengo certeza sobre una cifra**: indicar claramente "No dispongo de esa cifra específica" en lugar de aproximar.
+6. Conectar con dependencias o Secretarías cuando corresponda.  
+7. Invitar a hacer seguimiento ciudadano de la gestión.
 
 ## 📏 EJEMPLOS DE RESPUESTAS CORRECTAS:
 
 ✅ **CORRECTO**: "Según el Informe de Gestión PDD del 2° Trimestre 2025, página 45, la ejecución física promedio es del 25,18%."
 
+✅ **CORRECTO PARA INDICADORES**: "Los indicadores mostrados representan promedios de avance por dependencia. Por ejemplo, la Secretaría de TIC tiene un promedio del 48.8% con 3 de 10 indicadores completados, según datos oficiales actualizados."
+
 ✅ **CORRECTO**: "No tengo disponible esa cifra específica en los documentos que tengo acceso en este momento. Te recomiendo consultar directamente con la Secretaría correspondiente."
+
+✅ **CORRECTO PARA METAS**: "El Plan de Desarrollo 'Es Tiempo de Santander 2024-2027' establece 98 metas de resultado distribuidas en 17 sectores, organizadas en 3 ejes estratégicos. ¿Te interesa información sobre alguna meta específica?"
 
 ❌ **INCORRECTO**: "La ejecución es aproximadamente del 25%" (sin cita)
 ❌ **INCORRECTO**: "Creo que es alrededor del 25%" (impreciso)
+❌ **INCORRECTO**: "No sé sobre indicadores" (cuando la información está disponible)
 
 ---
 
@@ -185,13 +197,29 @@ Cuando me conecte por primera vez, SIEMPRE debo decir exactamente:
         # Buscar información relevante en la base de datos vectorial
         if new_message.content:
             try:
+                # Detectar si es una consulta sobre indicadores, metas o resultados
+                query_lower = new_message.content.lower()
+                is_indicator_query = any(keyword in query_lower for keyword in 
+                    ['indicador', 'meta', 'avance', 'progreso', 'resultado', 'ejecución', 'cumplimiento', 'secretaría', 'dependencia'])
+                
                 # Obtener contexto relevante de los documentos oficiales
                 document_context = await get_document_context(new_message.content)
                 
-                if document_context:
+                # Preparar contexto adicional para consultas de indicadores
+                additional_context = ""
+                if is_indicator_query:
+                    additional_context = "\n\nCONTEXTO ADICIONAL SOBRE INDICADORES:\n" + \
+                        "- El promedio general de avance del Plan de Desarrollo es del 25.0%\n" + \
+                        "- Se basa en más de 400 indicadores de 16 dependencias principales\n" + \
+                        "- Los porcentajes mostrados son PROMEDIOS de avance por dependencia\n" + \
+                        "- Dependencias con mejor desempeño: TIC (48.8%), Indersantander (43.65%), Planeación (43.02%)\n" + \
+                        "- Marco: Plan 'Es Tiempo de Santander 2024-2027' con 3 ejes estratégicos"
+                
+                if document_context or additional_context:
                     # Agregar contexto como mensaje del sistema
+                    full_context = f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}{additional_context}\n\n⚠️ INSTRUCCIÓN CRÍTICA: USA EXCLUSIVAMENTE ESTA INFORMACIÓN. CITA FUENTE EXACTA (documento, página) para CADA cifra o dato. Si no encuentras la cifra exacta aquí, NO la inventes. Di 'No dispongo de esa cifra específica'."
                     context_message = llm.ChatMessage.create(
-                        text=f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}\n\n⚠️ INSTRUCCIÓN CRÍTICA: USA EXCLUSIVAMENTE ESTA INFORMACIÓN. CITA FUENTE EXACTA (documento, página) para CADA cifra o dato. Si no encuentras la cifra exacta aquí, NO la inventes. Di 'No dispongo de esa cifra específica'.",
+                        text=full_context,
                         role="system"
                     )
                     chat_ctx.items.append(context_message)
