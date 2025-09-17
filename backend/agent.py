@@ -46,6 +46,25 @@ logger.info(f"Environment variables loaded successfully. LiveKit URL: {os.getenv
 
 # Helper to load full context from an external file and split into safe chunks
 
+def _split_text_chunks(data: str, max_chunk_chars: int = 3800) -> List[str]:
+    chunks: List[str] = []
+    if not data:
+        return chunks
+    data = "\n".join(line.rstrip() for line in data.splitlines())
+    start = 0
+    n = len(data)
+    while start < n:
+        end = min(start + max_chunk_chars, n)
+        cut = data.rfind("\n\n", start, end)
+        if cut == -1 or cut <= start + 800:
+            cut = end
+        chunk = data[start:cut].strip()
+        if chunk:
+            chunks.append(chunk)
+        start = cut
+    return chunks
+
+
 def _load_context_chunks_from_file(path: str, max_chunk_chars: int = 3800) -> List[str]:
     chunks: List[str] = []
     try:
@@ -54,20 +73,7 @@ def _load_context_chunks_from_file(path: str, max_chunk_chars: int = 3800) -> Li
                 data = f.read().strip()
             if not data:
                 return chunks
-            # Normalize trailing spaces
-            data = "\n".join(line.rstrip() for line in data.splitlines())
-            # Split near max_chunk_chars, try to cut on paragraph boundaries
-            start = 0
-            n = len(data)
-            while start < n:
-                end = min(start + max_chunk_chars, n)
-                cut = data.rfind("\n\n", start, end)
-                if cut == -1 or cut <= start + 800:  # fallback if no good break
-                    cut = end
-                chunk = data[start:cut].strip()
-                if chunk:
-                    chunks.append(chunk)
-                start = cut
+            chunks = _split_text_chunks(data, max_chunk_chars=max_chunk_chars)
         else:
             logger.warning(f"Full context file not found: {path}")
     except Exception as e:
@@ -765,11 +771,21 @@ La información anterior complementa las funciones de Gober con datos biográfic
         
         await self.update_chat_ctx(chat_ctx)
 
+class GovLabAssistantLite(Agent):
+    def __init__(self) -> None:
+        super().__init__(
+            instructions=(
+                "Eres Gober, asistente de Santander Territorio Inteligente. Responde con precisión,"
+                " cita fuentes cuando sea posible y no inventes cifras. Usa el CONTEXTO del sistema"
+                " (en mensajes previos) para responder. Si falta una cifra exacta, dilo."
+            )
+        )
+
 async def entrypoint(ctx: JobContext):
     try:
         logger.info(f"Conectando rápidamente a la sala {ctx.room.name}")
         # Aumentar timeout para permitir carga completa de modelos
-        await asyncio.wait_for(ctx.connect(), timeout=30.0)
+        await asyncio.wait_for(ctx.connect(), timeout=60.0)
 
         logger.info("Inicializando sesión del agente...")
 
@@ -777,18 +793,14 @@ async def entrypoint(ctx: JobContext):
         model = openai.realtime.RealtimeModel(
             voice="ash",
             model="gpt-4o-realtime-preview",
-            temperature=0.4,  # Reducir temperatura para más precisión
+            temperature=0.6,  # Cumple con el mínimo requerido por la API
         )
 
         # 2) Pre-cargar VAD para acelerar inicialización
         logger.info("Cargando VAD...")
         vad = silero.VAD.load()
         
-        # 3) Crear sesión con componentes pre-cargados
-        session = AgentSession(
-            llm=model,
-            vad=vad,
-        )
+        # 3) Crear sesión con componentes pre-cargados (se crea más abajo, tras configurar el agente)
 
         # 4) Crear e iniciar agente
         logger.info("Iniciando agente...")
@@ -798,32 +810,82 @@ async def entrypoint(ctx: JobContext):
             "GOBER_CONTEXT_FILE",
             os.path.join(os.path.dirname(__file__), "context", "agent_full_context.txt")
         )
+        # Leer texto completo (para inyección selectiva) y chunks (fallback)
+        full_context_text = ""
+        try:
+            if context_file and os.path.exists(context_file):
+                with open(context_file, "r", encoding="utf-8") as f:
+                    full_context_text = f.read()
+        except Exception as e:
+            logger.warning(f"No se pudo leer el contexto completo: {e}")
+
         full_context_chunks = _load_context_chunks_from_file(context_file)
+        if not full_context_text and not full_context_chunks:
+            logger.warning("No se encontraron chunks ni texto de contexto. Usando contexto de respaldo mínimo para indicadores.")
+            fallback_context = (
+                "🧠 CONTEXTO MINIMO (RESPALDO)\n"
+                "Plan 'Es Tiempo de Santander 2024–2027' — 3 ejes: Seguridad (68%), Sostenibilidad (17%), Prosperidad (15%).\n"
+                "Avance general a 30/06/2025: 25,18% ejecución física.\n"
+                "Top dependencias: TIC 48.8% (10 indicadores, 3 completados); Indersantander 43.65% (14, 4); Planeación 43.02% (19, 8); Educación 46.8% avance y 94.8% ejecución presupuestal (21, 8).\n"
+                "REGLAS: No inventar cifras; citar fuente cuando sea posible; si falta cifra exacta, indicarlo. Los % son promedios por dependencia.\n"
+            )
+            full_context_text = fallback_context
 
-        agent = GovLabAssistant()
-        # Reducir drásticamente las instrucciones para no exceder el límite de tokens
-        agent.instructions = (
-            "Eres Gober, asistente de Santander Territorio Inteligente. Responde con precisión,"
-            " cita fuentes cuando sea posible y no inventes cifras. Usa el CONTEXTO del sistema"
-            " (en mensajes previos) para responder. Si falta una cifra exacta, dilo."
-        )
-
-        # Adjuntar estado de contexto al agente y reemplazar la función de turno para inyectarlo una sola vez
-        agent._context_chunks = full_context_chunks
+        agent = GovLabAssistantLite()
+        # Estado de contexto en el agente
+        agent._full_context_text = full_context_text
         agent._context_loaded = False
+        agent._injected_sections = set()
+
+        def _select_relevant_slices(query: str, text: str, max_sections: int = 3, window: int = 2200) -> List[str]:
+            """Extrae porciones del contexto cercanas a palabras clave relevantes."""
+            if not text:
+                return []
+            q = (query or "").lower()
+            keywords = [
+                "indicador", "meta", "avance", "progreso", "resultado", "ejecución", "cumplimiento",
+                "educación", "tic", "indersantander", "planeación", "infraestructura", "salud",
+                "dependencias clave", "indicadores y porcentajes"
+            ]
+            # Priorizar keywords presentes en la consulta
+            ordered = sorted(keywords, key=lambda k: (k not in q, len(k)))
+            slices: List[str] = []
+            used_spans: List[tuple] = []
+            lower = text.lower()
+            for kw in ordered:
+                idx = lower.find(kw)
+                if idx == -1:
+                    continue
+                start = max(0, idx - window)
+                end = min(len(text), idx + window)
+                # Evitar solapamientos fuertes
+                if any(not (end <= s or start >= e) for s, e in used_spans):
+                    continue
+                used_spans.append((start, end))
+                slices.append(text[start:end])
+                if len(slices) >= max_sections:
+                    break
+            # Si no se encontró nada, tomar el inicio del documento
+            if not slices:
+                slices.append(text[:min(len(text), window * 2)])
+            return slices
 
         async def _new_on_user_turn_completed(chat_ctx: llm.ChatContext, new_message: llm.ChatMessage) -> None:
-            # 1) Inyectar el CONTEXTO completo una sola vez como mensajes 'system'
-            if not getattr(agent, "_context_loaded", False) and agent._context_chunks:
-                for idx, chunk in enumerate(agent._context_chunks, 1):
-                    chat_ctx.items.append(
-                        llm.ChatMessage.create(
-                            text=f"[CONTEXTO {idx}/{len(agent._context_chunks)}]\n" + chunk,
-                            role="system"
+            # 1) Inyección selectiva del CONTEXTO en función de la consulta (primera vez)
+            if not getattr(agent, "_context_loaded", False):
+                selected = _select_relevant_slices(getattr(new_message, "content", ""), agent._full_context_text)
+                injected = 0
+                for i, sl in enumerate(selected, 1):
+                    for chunk in _split_text_chunks(sl, max_chunk_chars=3000)[:4]:  # limitar tamaño por sección
+                        chat_ctx.items.append(
+                            llm.ChatMessage.create(
+                                text=f"[CONTEXTO SELECCIONADO {i}]\n" + chunk,
+                                role="system"
+                            )
                         )
-                    )
+                        injected += 1
                 agent._context_loaded = True
-                logger.info(f"Contexto completo inyectado: {len(agent._context_chunks)} bloques")
+                logger.info(f"Contexto selectivo inyectado: {injected} bloques")
 
             # 2) Conservar SIEMPRE los mensajes 'system' y recortar el resto para ahorrar memoria
             preserved = [m for m in chat_ctx.items if getattr(m, "role", "") == "system"]
@@ -846,6 +908,23 @@ async def entrypoint(ctx: JobContext):
                             role="system"
                         )
                     )
+                    # Refuerzo con referencia rápida para indicadores clave
+                    quick_ref = (
+                        "📊 REFERENCIA RÁPIDA (PROMEDIOS POR DEPENDENCIA)\n"
+                        "- Educación: 46.8% avance físico, 94.8% ejecución presupuestal; 21 indicadores, 8 completados\n"
+                        "- TIC: 48.8% avance físico; 10 indicadores, 3 completados\n"
+                        "- Indersantander: 43.65% avance físico; 14 indicadores, 4 completados\n"
+                        "- Planeación: 43.02% avance físico; 19 indicadores, 8 completados\n"
+                        "- Infraestructura: 22.8% avance físico; 53 indicadores, 15 completados\n"
+                        "- Salud: 26.89% avance físico; 54 indicadores, 12 completados\n"
+                        "- Avance general a 30/06/2025: 25.18% ejecución física (promedio).\n"
+                    )
+                    chat_ctx.items.append(
+                        llm.ChatMessage.create(
+                            text=quick_ref,
+                            role="system"
+                        )
+                    )
 
             await agent.update_chat_ctx(chat_ctx)
 
@@ -856,9 +935,12 @@ async def entrypoint(ctx: JobContext):
         session = AgentSession(
             llm=model,
             vad=vad,
-            chat_ctx_max_items=40,
         )
-        await session.start(room=ctx.room, agent=agent)
+        await session.start(
+            room=ctx.room,
+            agent=agent,
+            room_input_options=RoomInputOptions(close_on_disconnect=False)
+        )
 
         # 5) Generar saludo inicial exacto
         await session.generate_reply(
