@@ -694,8 +694,15 @@ La información anterior complementa las funciones de Gober con datos biográfic
                 indicator_keywords = ['indicador', 'meta', 'avance', 'progreso', 'resultado', 'ejecución', 'cumplimiento', 'secretaría', 'dependencia', 'educación', 'salud', 'tic', 'infraestructura', 'planeación', 'completado', 'completados', 'logrado', 'alcanzado']
                 is_indicator_query = any(keyword in query_lower for keyword in indicator_keywords)
                 
-                # SIEMPRE obtener contexto de los documentos oficiales
-                document_context = await get_document_context(new_message.content)
+                logger.info(f"Procesando consulta sobre indicadores: {is_indicator_query} - {new_message.content[:50]}...")
+                
+                # Intentar obtener contexto de los documentos oficiales
+                document_context = ""
+                try:
+                    document_context = await get_document_context(new_message.content)
+                except Exception as context_error:
+                    logger.warning(f"No se pudo obtener contexto de base vectorial: {context_error}")
+                    # Continuar sin contexto vectorial
                 
                 # Preparar contexto adicional para consultas de indicadores
                 additional_context = ""
@@ -710,12 +717,12 @@ La información anterior complementa las funciones de Gober con datos biográfic
                 # SIEMPRE agregar contexto (incluso si está vacío, para forzar búsqueda)
                 if document_context or additional_context or True:  # Siempre ejecutar
                     instruction = ""
-                    if document_context:
+                    if document_context and document_context.strip():
                         instruction = "TIENES ACCESO A INFORMACIÓN OFICIAL DETALLADA. USA ESTA INFORMACIÓN PARA RESPONDER CON DATOS ESPECÍFICOS Y CITAS EXACTAS."
                     else:
-                        instruction = "SI NO ENCUENTRAS INFORMACIÓN ESPECÍFICA EN LOS DOCUMENTOS, USA LOS DATOS DE REFERENCIA RÁPIDA Y MENCIONA QUE PARA MÁS DETALLES SE PUEDE CONSULTAR LOS INFORMES OFICIALES."
+                        instruction = "USA LOS DATOS DE REFERENCIA RÁPIDA DE TUS INSTRUCCIONES. TIENES INFORMACIÓN COMPLETA SOBRE TODAS LAS SECRETARÍAS Y SUS INDICADORES. Para detalles adicionales, menciona que se puede consultar los informes oficiales."
                     
-                    full_context = f"CONTEXTO DE DOCUMENTOS OFICIALES:\n{document_context}{additional_context}\n\n⚠️ INSTRUCCIÓN: {instruction} Siempre cita fuente cuando sea posible."
+                    full_context = f"CONTEXTO DE CONSULTA:\n{document_context}{additional_context}\n\n⚠️ INSTRUCCIÓN: {instruction} Proporciona información específica basada en tus conocimientos del Plan de Desarrollo."
                     context_message = llm.ChatMessage.create(
                         text=full_context,
                         role="system"
@@ -732,8 +739,8 @@ La información anterior complementa las funciones de Gober con datos biográfic
 async def entrypoint(ctx: JobContext):
     try:
         logger.info(f"Conectando rápidamente a la sala {ctx.room.name}")
-        # Reducir timeout para conexión más rápida
-        await asyncio.wait_for(ctx.connect(), timeout=10.0)
+        # Aumentar timeout para permitir carga completa de modelos
+        await asyncio.wait_for(ctx.connect(), timeout=30.0)
 
         logger.info("Inicializando sesión del agente...")
 

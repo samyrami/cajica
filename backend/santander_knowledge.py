@@ -207,8 +207,15 @@ class SantanderKnowledge:
         """
         return self.vector_db.get_document_stats()
 
-# Instancia global para usar en el agente
-knowledge_manager = SantanderKnowledge()
+# Instancia global para usar en el agente (lazy loading)
+knowledge_manager = None
+
+def get_knowledge_manager():
+    """Obtiene o crea la instancia del gestor de conocimiento (lazy loading)"""
+    global knowledge_manager
+    if knowledge_manager is None:
+        knowledge_manager = SantanderKnowledge()
+    return knowledge_manager
 
 async def search_santander_documents(query: str, max_results: int = 3) -> str:
     """
@@ -221,7 +228,8 @@ async def search_santander_documents(query: str, max_results: int = 3) -> str:
     Returns:
         str: Respuesta formateada
     """
-    response = await knowledge_manager.answer_with_sources(query)
+    km = get_knowledge_manager()
+    response = await km.answer_with_sources(query)
     return response["formatted_response"]
 
 async def get_document_context(query: str) -> str:
@@ -234,4 +242,5 @@ async def get_document_context(query: str) -> str:
     Returns:
         str: Contexto relevante
     """
-    return await knowledge_manager.get_context_for_query(query)
+    km = get_knowledge_manager()
+    return await km.get_context_for_query(query)
