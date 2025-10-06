@@ -1,6 +1,6 @@
 # Asistente Virtual de la Alcaldía de Cajicá
 
-![Asistente Virtual de Cajicá](https://i.ibb.co/jvmwnqnf/Screenshot-2025-02-12-194345.png)
+
 
 ## Descripción
 Asistente de IA conversacional desarrollado para la Alcaldía de Cajicá, diseñado específicamente para brindar información sobre el Plan de Desarrollo Municipal 2024-2027 "Cajicá Avanza con Todos". Utiliza tecnologías avanzadas de procesamiento de lenguaje natural y análisis de voz para proporcionar asistencia inteligente a los ciudadanos sobre los objetivos estratégicos, avances e indicadores del municipio.
