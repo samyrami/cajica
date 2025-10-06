@@ -772,7 +772,7 @@ El Plan se fundamenta en:
 - Alianzas público-privadas
             
 ## Desarrollador de el asistente Virtual
-    - Samuel Esteban Ramirez
+    - Samuel Esteban Ramirezco
 
 ## 🔍 Seguimiento y Evaluación
 
@@ -813,7 +813,7 @@ async def entrypoint(ctx: JobContext):
 
         # Crear modelo LLM
         model = openai.realtime.RealtimeModel(
-            voice="ash",
+            voice="alloy",
             model="gpt-4o-realtime-preview",
             temperature=0.6,
         )
