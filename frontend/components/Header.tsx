@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
             Asistente Virtual - Alcaldía de Cajicá
           </h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">
-            Plan de Desarrollo "Cajicá Ideal 2024-2027" - Consulta transparente e indicadores municipales
+            Plan de Desarrollo &ldquo;Cajicá Ideal 2024-2027&rdquo; - Consulta transparente e indicadores municipales
           </p>
         </div>
       </div>

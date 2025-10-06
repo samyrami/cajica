@@ -50,7 +50,7 @@ export default function Page() {
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Este asistente de voz proporciona información verificada y actualizada sobre el Plan de Desarrollo 
-                    Municipal "Cajicá Ideal 2024-2027". Desarrollado en colaboración con la Universidad de La Sabana 
+                    Municipal &ldquo;Cajicá Ideal 2024-2027&rdquo;. Desarrollado en colaboración con la Universidad de La Sabana 
                     y el Laboratorio de Gobierno para promover la transparencia municipal y el acceso ciudadano 
                     a la información pública.
                   </p>
@@ -133,7 +133,7 @@ export default function Page() {
                   Tipos de Consultas Disponibles
                 </h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Plan de Desarrollo "Cajicá Ideal 2024-2027"</li>
+                  <li>• Plan de Desarrollo &ldquo;Cajicá Ideal 2024-2027&rdquo;</li>
                   <li>• Indicadores por dimensiones estratégicas</li>
                   <li>• Servicios municipales y coberturas</li>
                   <li>• Programas sociales, culturales y deportivos</li>
