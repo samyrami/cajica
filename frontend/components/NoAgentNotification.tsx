@@ -68,7 +68,7 @@ export function NoAgentNotification(props: NoAgentNotificationProps) {
             </svg>
           </div>
           <p className="text-pretty w-max text-foreground">
-            <strong>Gober</strong> se está conectando...<br/>
+            El <strong>Asistente Virtual de Cajicá</strong> se está conectando...<br/>
             <span className="text-sm text-muted-foreground">
               Si el problema persiste, verifica que el backend esté ejecutándose con <code className="bg-muted px-1 rounded">python agent.py dev</code>
             </span>

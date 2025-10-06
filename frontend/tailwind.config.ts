@@ -18,6 +18,14 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Colores de la bandera de Cajicá
+        cajica: {
+          green: "#22c55e", // Verde - Representa los campos y la vida
+          gold: "#fbbf24", // Amarillo dorado - Simboliza la riqueza de la tierra
+          white: "#ffffff", // Blanco - Simboliza la paz y generosidad
+          blue: "#3b82f6", // Azul - Tradición religiosa y del escudo
+          red: "#ef4444", // Rojo (gules) - Industria pujante
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

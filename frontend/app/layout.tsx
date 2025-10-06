@@ -10,8 +10,8 @@ const publicSans = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Gober - Santander Territorio inteligente",
-  description: "Consulta transparente sobre objetivos estratégicos y avances institucionales de Santander Territorio inteligente",
+  title: "Asistente Virtual - Alcaldía de Cajicá",
+  description: "Consulta transparente sobre el Plan de Desarrollo Municipal 'Cajicá Ideal 2024-2027' - Información oficial de indicadores y servicios municipales",
 };
 
 export default function RootLayout({

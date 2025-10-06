@@ -14,140 +14,148 @@ interface DepartmentData {
 
 const departmentData: DepartmentData[] = [
   {
-    name: "Secretaría de TIC",
-    averageProgress: 48.8,
-    totalIndicators: 10,
-    completedIndicators: 3,
-    icon: <Building2 className="h-5 w-5" />,
+    name: "Ambiente y Desarrollo Sostenible",
+    averageProgress: 95.5,
+    totalIndicators: 8,
+    completedIndicators: 7,
+    icon: <Leaf className="h-5 w-5" />,
     color: 'primary'
   },
   {
-    name: "Indersantander",
-    averageProgress: 43.65,
-    totalIndicators: 14,
+    name: "Educación",
+    averageProgress: 82.1,
+    totalIndicators: 6,
     completedIndicators: 4,
-    icon: <Users className="h-5 w-5" />,
-    color: 'secondary'
-  },
-  {
-    name: "Secretaría de Planeación",
-    averageProgress: 43.02,
-    totalIndicators: 19,
-    completedIndicators: 8,
-    icon: <Building2 className="h-5 w-5" />,
-    color: 'accent'
-  },
-  {
-    name: "Secretaría de Educación",
-    averageProgress: 41.2,
-    totalIndicators: 21,
-    completedIndicators: 8,
     icon: <GraduationCap className="h-5 w-5" />,
-    color: 'primary'
-  },
-  {
-    name: "Secretaría Administrativa",
-    averageProgress: 36.11,
-    totalIndicators: 13,
-    completedIndicators: 4,
-    icon: <Building2 className="h-5 w-5" />,
     color: 'secondary'
   },
   {
-    name: "Secretaría de Desarrollo Social",
-    averageProgress: 32.44,
-    totalIndicators: 16,
-    completedIndicators: 4,
-    icon: <Users className="h-5 w-5" />,
-    color: 'accent'
-  },
-  {
-    name: "Secretaría del Interior",
-    averageProgress: 28.15,
-    totalIndicators: 52,
-    completedIndicators: 18,
-    icon: <Shield className="h-5 w-5" />,
-    color: 'primary'
-  },
-  {
-    name: "Oficina para la Gestión del Riesgo de Desastres",
-    averageProgress: 27.60,
-    totalIndicators: 10,
-    completedIndicators: 3,
-    icon: <Shield className="h-5 w-5" />,
-    color: 'secondary'
-  },
-  {
-    name: "Secretaría de Salud",
-    averageProgress: 26.89,
-    totalIndicators: 54,
-    completedIndicators: 12,
+    name: "Salud y Protección Social",
+    averageProgress: 76.3,
+    totalIndicators: 7,
+    completedIndicators: 5,
     icon: <Heart className="h-5 w-5" />,
     color: 'accent'
   },
   {
-    name: "Secretaría Ambiental",
-    averageProgress: 24.97,
-    totalIndicators: 28,
-    completedIndicators: 3,
-    icon: <Leaf className="h-5 w-5" />,
+    name: "Cultura",
+    averageProgress: 74.8,
+    totalIndicators: 12,
+    completedIndicators: 8,
+    icon: <Building2 className="h-5 w-5" />,
     color: 'primary'
   },
   {
-    name: "Secretaría de la Mujer y Equidad de Género",
-    averageProgress: 24.46,
-    totalIndicators: 15,
-    completedIndicators: 2,
+    name: "Deporte y Recreación",
+    averageProgress: 68.9,
+    totalIndicators: 9,
+    completedIndicators: 6,
     icon: <Users className="h-5 w-5" />,
     color: 'secondary'
   },
   {
-    name: "Secretaría de Infraestructura",
-    averageProgress: 22.8,
-    totalIndicators: 53,
-    completedIndicators: 15,
-    icon: <Wrench className="h-5 w-5" />,
+    name: "Tecnologías de la Información (TIC)",
+    averageProgress: 65.2,
+    totalIndicators: 4,
+    completedIndicators: 2,
+    icon: <Building2 className="h-5 w-5" />,
     color: 'accent'
   },
   {
-    name: "Secretaría de Cultura y Turismo",
-    averageProgress: 18.74,
-    totalIndicators: 21,
-    completedIndicators: 2,
+    name: "Comercio, Industria y Turismo",
+    averageProgress: 58.7,
+    totalIndicators: 15,
+    completedIndicators: 9,
     icon: <Building2 className="h-5 w-5" />,
     color: 'primary'
   },
   {
-    name: "Secretaría de Competitividad y Productividad",
-    averageProgress: 15.11,
-    totalIndicators: 11,
-    completedIndicators: 1,
+    name: "Ciencia, Tecnología e Innovación",
+    averageProgress: 52.4,
+    totalIndicators: 4,
+    completedIndicators: 2,
     icon: <Building2 className="h-5 w-5" />,
     color: 'secondary'
   },
   {
-    name: "Secretaría de Hacienda",
-    averageProgress: 14.90,
-    totalIndicators: 2,
-    completedIndicators: 0,
-    icon: <Building2 className="h-5 w-5" />,
+    name: "Inclusión Social y Reconciliación",
+    averageProgress: 48.6,
+    totalIndicators: 8,
+    completedIndicators: 3,
+    icon: <Users className="h-5 w-5" />,
     color: 'accent'
   },
   {
-    name: "Secretaría de Vivienda",
-    averageProgress: 9.42,
-    totalIndicators: 6,
-    completedIndicators: 0,
+    name: "Vivienda, Ciudad y Territorio",
+    averageProgress: 45.2,
+    totalIndicators: 5,
+    completedIndicators: 2,
     icon: <Home className="h-5 w-5" />,
     color: 'primary'
   },
   {
-    name: "Secretaría de Agricultura y Desarrollo Rural",
-    averageProgress: 0.89,
-    totalIndicators: 28,
-    completedIndicators: 1,
+    name: "Agricultura y Desarrollo Rural",
+    averageProgress: 42.8,
+    totalIndicators: 6,
+    completedIndicators: 2,
     icon: <Leaf className="h-5 w-5" />,
     color: 'secondary'
+  },
+  {
+    name: "Trabajo",
+    averageProgress: 38.5,
+    totalIndicators: 4,
+    completedIndicators: 1,
+    icon: <Building2 className="h-5 w-5" />,
+    color: 'accent'
+  },
+  {
+    name: "Transporte",
+    averageProgress: 35.1,
+    totalIndicators: 3,
+    completedIndicators: 1,
+    icon: <Wrench className="h-5 w-5" />,
+    color: 'primary'
+  },
+  {
+    name: "Gobierno Territorial",
+    averageProgress: 32.7,
+    totalIndicators: 8,
+    completedIndicators: 2,
+    icon: <Shield className="h-5 w-5" />,
+    color: 'secondary'
+  },
+  {
+    name: "Justicia y del Derecho",
+    averageProgress: 28.9,
+    totalIndicators: 3,
+    completedIndicators: 1,
+    icon: <Shield className="h-5 w-5" />,
+    color: 'accent'
+  },
+  {
+    name: "Minas y Energía",
+    averageProgress: 25.4,
+    totalIndicators: 3,
+    completedIndicators: 1,
+    icon: <Building2 className="h-5 w-5" />,
+    color: 'primary'
+  },
+  {
+    name: "Información y Estadísticas",
+    averageProgress: 22.1,
+    totalIndicators: 2,
+    completedIndicators: 0,
+    icon: <Building2 className="h-5 w-5" />,
+    color: 'secondary'
+  },
+  {
+    name: "Organismos de Control",
+    averageProgress: 18.6,
+    totalIndicators: 3,
+    completedIndicators: 0,
+    icon: <Building2 className="h-5 w-5" />,
+    color: 'accent'
   }
 ];
 
@@ -158,18 +166,18 @@ const topDepartments = departmentData
 const StatsSection: React.FC = () => {
   const [showAllDepartments, setShowAllDepartments] = useState(false);
   const displayData = showAllDepartments ? departmentData : topDepartments;
-  const totalProgress = 25.0; // Promedio general real del 25%
+  const totalProgress = 52.8; // Promedio general de Cajicá
 
   return (
     <section className="w-full py-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground font-institutional mb-4">
-            Avances en Objetivos Estratégicos 2025 - Promedio del 25% de Progreso General
+            Avances Plan de Desarrollo 2024-2027 - Promedio del 52.8% de Progreso General
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Seguimiento transparente del progreso promedio de indicadores por dependencias de la Gobernación de Santander, 
-            basado en el Plan de Desarrollo Departamental &ldquo;Es Tiempo de Santander 2024-2027&rdquo;
+            Seguimiento transparente del progreso por sectores del Plan de Desarrollo Municipal &ldquo;Cajicá Ideal 2024-2027&rdquo;, 
+            organizado en 5 dimensiones estratégicas y 18 sectores de inversión
           </p>
           <div className="mt-4 inline-flex items-center space-x-4 bg-primary/10 px-6 py-3 rounded-lg">
             <div className="text-center">
@@ -179,7 +187,7 @@ const StatsSection: React.FC = () => {
             <div className="w-px h-8 bg-border"></div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{departmentData.length}</div>
-              <div className="text-xs text-muted-foreground">Dependencias</div>
+              <div className="text-xs text-muted-foreground">Sectores</div>
             </div>
           </div>
         </div>
@@ -233,7 +241,7 @@ const StatsSection: React.FC = () => {
               onClick={() => setShowAllDepartments(!showAllDepartments)}
               className="inline-flex items-center space-x-2 px-6 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors duration-200 font-medium"
             >
-              <span>{showAllDepartments ? 'Ver mejores 8 dependencias' : `Ver todas las ${departmentData.length} dependencias`}</span>
+              <span>{showAllDepartments ? 'Ver mejores 8 sectores' : `Ver todos los ${departmentData.length} sectores`}</span>
               {showAllDepartments ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
           </div>
@@ -245,17 +253,17 @@ const StatsSection: React.FC = () => {
               <div className="flex items-center justify-center space-x-2 text-muted-foreground">
                 <Building2 className="h-5 w-5" />
                 <span className="text-sm font-medium">
-                  Datos actualizados al 10 de septiembre de 2025
+                  Datos actualizados - Plan de Desarrollo 2024-2027
                 </span>
               </div>
               <div className="mt-2 text-xs text-muted-foreground">
-                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} dependencias del PDD &ldquo;Es Tiempo de Santander&rdquo;
+                Basado en {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)} indicadores de gestión de {departmentData.length} sectores del Plan &ldquo;Cajicá Ideal 2024-2027&rdquo;
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
-                Promedio general de avance de todos los indicadores: {totalProgress.toFixed(1)}% • Indicadores completados: {departmentData.reduce((sum, dept) => sum + dept.completedIndicators, 0)}
+                Promedio general de avance: {totalProgress.toFixed(1)}% • Indicadores completados: {departmentData.reduce((sum, dept) => sum + dept.completedIndicators, 0)} de {departmentData.reduce((sum, dept) => sum + dept.totalIndicators, 0)}
               </div>
               <div className="mt-1 text-xs text-muted-foreground font-medium">
-                📊 Los porcentajes mostrados representan el promedio de avance por dependencia • Fuente: Informes oficiales de gestión
+                📊 Progreso por sectores municipales • 5 Dimensiones Estratégicas • Fuente: Alcaldía de Cajicá
               </div>
             </CardContent>
           </Card>

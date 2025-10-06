@@ -93,7 +93,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
   // Solo manejar estado inicial para respuesta genérica si no hay transcripciones
   useEffect(() => {
     if (agentState === "speaking" && !lastUserTranscript && onResponse) {
-      onResponse("Procesando su consulta sobre los objetivos estratégicos de la Gobernación de Santander...");
+      onResponse("Procesando su consulta sobre los objetivos estratégicos del Plan de Desarrollo de Cajicá 2024-2027...");
     }
   }, [agentState, onResponse, lastUserTranscript]);
 
@@ -107,7 +107,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
     if (agentState === 'listening' && !hasAddedWelcomeMessage && onAddMessage) {
       console.log('Adding welcome message - agent ready');
       setTimeout(() => {
-        onAddMessage('assistant', '¡Hola! Soy Gober, el asistente virtual de Santander Territorio inteligente. Puedes preguntarme sobre los objetivos estratégicos y avances del departamento. ¿En qué puedo ayudarte hoy?');
+        onAddMessage('assistant', '¡Hola! Soy tu asistente virtual de la Alcaldía de Cajicá. Puedes preguntarme sobre los objetivos estratégicos y avances del Plan de Desarrollo Municipal 2024-2027. ¿En qué puedo ayudarte hoy?');
       }, 1000); // Delay para asegurar que la conexión esté estable
       setHasAddedWelcomeMessage(true);
     }
@@ -127,7 +127,7 @@ const ConversationalAgent: React.FC<ConversationalAgentProps> = ({ onResponse, o
         <CardContent className="p-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-foreground font-institutional mb-2">
-              Gober
+              Asistente Virtual de Cajicá
             </h2>
             <p className="text-muted-foreground">
               ¿En qué puedo ayudarte hoy? Puedes hablar conmigo usando el micrófono o escribir tu consulta.
@@ -473,7 +473,7 @@ function ControlBar(props: {
             className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-lg hover:shadow-xl"
             onClick={() => props.onConnectButtonClicked()}
           >
-            🎙️ Haz clic aquí y pregúntame sobre la Gobernación de Santander
+            🎙️ Haz clic aquí y pregúntame sobre la Alcaldía de Cajicá
           </motion.button>
         )}
       </AnimatePresence>

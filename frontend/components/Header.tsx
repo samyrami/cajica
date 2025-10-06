@@ -7,17 +7,17 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   return (
-    <header className={`w-full bg-background border-b border-border py-6 ${className}`}>
+    <header className={`w-full bg-white border-b border-border py-6 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center gap-8 md:gap-12 lg:gap-16">
-          {/* Laboratorio de Gobierno */}
+          {/* Escudo de Cajicá */}
           <div className="flex items-center justify-center">
             <Image
-              src="/images/logo-laboratorio-gobierno.png"
-              alt="Laboratorio de Gobierno"
+              src="/images/Escudo_de_Cajicá.svg"
+              alt="Escudo de Cajicá"
               width={80}
               height={80}
-              className="h-12 md:h-16 w-auto object-contain"
+              className="h-12 md:h-16 w-auto object-contain bg-white rounded-lg p-2 shadow-lg"
               priority
             />
           </div>
@@ -34,11 +34,11 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
             />
           </div>
           
-          {/* Gobernación de Santander */}
+          {/* Laboratorio de Gobierno */}
           <div className="flex items-center justify-center">
             <Image
-              src="/images/logo-gobernacion-santander.png"
-              alt="Gobernación de Santander"
+              src="/images/logo-laboratorio-gobierno.png"
+              alt="Laboratorio de Gobierno"
               width={80}
               height={80}
               className="h-12 md:h-16 w-auto object-contain"
@@ -48,11 +48,11 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
         </div>
         
         <div className="text-center mt-4">
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-foreground font-institutional">
-            Gober - Santander Territorio inteligente
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-800 font-institutional">
+            Asistente Virtual - Alcaldía de Cajicá
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm md:text-base">
-            Consulta transparente sobre objetivos estratégicos y avances institucionales
+          <p className="text-gray-600 mt-2 text-sm md:text-base">
+            Plan de Desarrollo "Cajicá Ideal 2024-2027" - Consulta transparente e indicadores municipales
           </p>
         </div>
       </div>

@@ -1,17 +1,17 @@
-# Govi - GovLab AI Assistant
+# Asistente Virtual de la Alcaldía de Cajicá
 
-![Govi - GovLab AI Assistant](https://i.ibb.co/jvmwnqnf/Screenshot-2025-02-12-194345.png)
+![Asistente Virtual de Cajicá](https://i.ibb.co/jvmwnqnf/Screenshot-2025-02-12-194345.png)
 
 ## Descripción
-Govi es un asistente de IA conversacional desarrollado por GovLab, diseñado específicamente para transformar la gestión pública a través de interacciones en tiempo real. Utiliza tecnologías avanzadas de procesamiento de lenguaje natural y análisis de voz para proporcionar asistencia inteligente en el sector público.
+Asistente de IA conversacional desarrollado para la Alcaldía de Cajicá, diseñado específicamente para brindar información sobre el Plan de Desarrollo Municipal 2024-2027 "Cajicá Avanza con Todos". Utiliza tecnologías avanzadas de procesamiento de lenguaje natural y análisis de voz para proporcionar asistencia inteligente a los ciudadanos sobre los objetivos estratégicos, avances e indicadores del municipio.
 
 ## Características Principales
-- 🎯 Interacción por voz en tiempo real
-- 🔄 Procesamiento automático de PQRS
-- 📊 Visualización de análisis de datos
-- 🤝 Interfaz intuitiva para funcionarios públicos
-- 🔒 Seguridad de nivel gubernamental
-- 🌐 Optimizado para español latinoamericano
+- 🎯 Interacción por voz en tiempo real sobre el Plan de Desarrollo de Cajicá
+- 📄 Información actualizada de los 18 sectores estratégicos
+- 🏆 Consultas sobre avances e indicadores municipales
+- 🤝 Interfaz intuitiva para ciudadanos y funcionarios
+- 🔒 Seguridad y privacidad de datos
+- 🌐 Optimizado para el contexto municipal de Cajicá
 
 ## Tecnologías Utilizadas
 - OpenAI Realtime API
@@ -32,10 +32,10 @@ Govi es un asistente de IA conversacional desarrollado por GovLab, diseñado esp
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/govlab/govi-assistant.git
+git clone https://github.com/govlab/cajica-assistant.git
 
 # Instalar dependencias
-cd govi-assistant
+cd cajica-assistant
 npm install
 
 # Configurar variables de entorno
@@ -57,32 +57,33 @@ NEXT_PUBLIC_CONN_DETAILS_ENDPOINT=/api/connection-details
 ## Uso
 El asistente puede ser utilizado para:
 
-1. **Análisis y Desarrollo de IA**
-   - Plataformas de análisis para políticas públicas
-   - Sistemas de predicción y simulación
-   - Análisis de sentimiento y opinión pública
+1. **Consultas sobre el Plan de Desarrollo Municipal**
+   - Objetivos estratégicos de "Cajicá Avanza con Todos"
+   - Avances en las 7 dimensiones estratégicas
+   - Indicadores de los 18 sectores municipales
 
-2. **Mejora de Eficiencia Operativa**
-   - Analítica de datos para optimización
-   - Plataformas inteligentes para PQRS
-   - Asistentes virtuales para decisiones
+2. **Información Institucional**
+   - Estructura organizacional de la Alcaldía
+   - Programas y proyectos en ejecución
+   - Contacto con dependencias municipales
 
-3. **Gestión de Datos**
-   - Dashboards interactivos
-   - Simuladores de decisiones
-   - Monitoreo en tiempo real
+3. **Servicios al Ciudadano**
+   - Trámites y servicios disponibles
+   - Información sobre políticas públicas locales
+   - Participación ciudadana y rendición de cuentas
 
 ## Arquitectura del Sistema
 
 ```
-govi-assistant/
-├── src/
+cajica-assistant/
+├── frontend/
+│   ├── app/
 │   ├── components/
 │   ├── lib/
-│   ├── pages/
-│   └── styles/
-├── public/
-├── tests/
+│   └── public/
+├── backend/
+│   ├── agent.py
+│   └── requirements.txt
 └── config/
 ```
 
@@ -92,10 +93,11 @@ govi-assistant/
 - Cumplimiento con estándares gubernamentales
 - Auditoría de interacciones
 
-## Casos de Éxito
-- **CAResponde**: Sistema LLM para procesamiento automático de PQRS
-- **DataGov**: Dashboard de análisis para toma de decisiones
-- **CrisisManager**: Sistema de gestión de crisis en tiempo real
+## Casos de Uso en Cajicá
+- **Consultas Plan de Desarrollo**: Información sobre objetivos estratégicos y avances
+- **Indicadores Municipales**: Seguimiento a los 18 sectores del plan municipal
+- **Atención al Ciudadano**: Respuestas instantáneas sobre servicios y trámites
+- **Transparencia**: Información sobre gestión y rendición de cuentas
 
 ## Contribuir
 1. Fork del repositorio
@@ -106,9 +108,10 @@ govi-assistant/
 
 ## Soporte
 Para soporte técnico o consultas:
-- Email: soporte@govlab.com
-- WhatsApp: +[número]
-- Portal: www.govlab.com/soporte
+- Alcaldía de Cajicá: www.cajica-cundinamarca.gov.co
+- Teléfono: (+57) 1 878 2828
+- Email: contacto@cajica-cundinamarca.gov.co
+- Soporte técnico: soporte@govlab.com
 
 ## Licencia
 Este proyecto está licenciado bajo términos específicos para uso gubernamental. Contactar a GovLab para más detalles.
